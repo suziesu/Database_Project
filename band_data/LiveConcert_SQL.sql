@@ -17,7 +17,7 @@
 -- Follow (username, fusername, ftime)
 -- CUser (username, accumulogintime, score)
 -- Loginrecord(username, logintime, logouttime)
--- Artist (username, verifystatus, verifytime, verifiedID,baname)
+-- Artist (username, verifystatus, verifytime, verifiedID,baname, allowpost)
 -- Band(baname, bbio, postby, bptime)
 -- BandMember (baname, bandmember)
 -- Venues (locname, address, city, state, capacity, web)
@@ -30,12 +30,12 @@
 -- UserTaste (username, typename, subtypename)
 -- BandType (baname, typename, subtypename)
 -- FansOf (username, baname, fobtime)
--- AttendConcert (username, cname)
+-- AttendConcert (username, cname, decision)
 -- ConcertRating (username, cname, rating, review, ratetime, reviewtime)
 -- UserRecommendList (listname, username, lcreatetime, ldescription)
 -- ListFollower (listname, follower)
 -- RecommencList (listname, cname)
---ConcertProcess (cname, posttime,postby, cstatus,datetime,locname,price,cdescription)
+-- ConcertProcess (cname, posttime,editby, cstatus,cdatetime,locname,price,cdescription)
 
 drop table IF EXISTS User;
 CREATE table User(
@@ -91,6 +91,7 @@ create table Artist(
 	verifytime datetime,
 	verifyID varchar(10),
 	baname varchar(30), 
+	allowpost boolean not null default 1,
 	PRIMARY KEY (username, logintime),
 	FOREIGN KEY (username) REFERENCES User(username),
 	FOREIGN KEY (baname) REFERENCES Band(baname)
@@ -119,7 +120,7 @@ create table Venues(
 drop table IF EXISTS Concert;
 create table Concert(
 	cname varchar(50),
-	cdatetime datetime not null,
+	cdatetime datetime,
 	locname varchar(50),
 	price int(4),
 	availability int(5),
@@ -132,7 +133,22 @@ create table Concert(
 	FOREIGN KEY (locname) REFERENCES Venues(locname),
 	FOREIGN KEY (cpostby) REFERENCES User(username)
 );
+ConcertProcess (cname, posttime,editby, cstatus, cdatetime,locname,price,cdescription)
+drop table IF EXISTS ConcertProcess;
+create table ConcertProcess(
+	cname varchar(50),
+	posttime datetime not null,
+	editby varchar(10),
+	cstatus varchar(10),
+	cdatetime datetime,
+	locname varchar(50),
+	price int(4),
+	cdescription text,
+	PRIMARY KEY (cname,posttime,editby),
+	FOREIGN KEY (editby) REFERENCES User(username),
+	FOREIGN KEY (cname) REFERENCES Concert(cname)
 
+);
 drop table IF EXISTS Userticket;
 create table Userticket(
 	username varchar(10),
@@ -207,6 +223,7 @@ drop table IF EXISTS AttendConcert;
 create table AttendConcert(
 	username varchar(10),
 	cname varchar(50),
+	decision varchar(10),
 	PRIMARY KEY (username, cname),
 	FOREIGN KEY (username) REFERENCES User(username),
 	FOREIGN KEY (cname) REFERENCES Concert(cname)
