@@ -3,7 +3,7 @@
 --version 1.0
 --time Nov 08 2014
 --CREATE table User(
--- 	username varchar(10) PRIMARY KEY,
+-- 	username varchar(30) PRIMARY KEY,
 -- 	name varchar(20),
 -- 	dob date default NULL,
 -- 	email varchar(50) default NULL,
@@ -37,9 +37,41 @@
 -- RecommencList (listname, cname)
 -- ConcertProcess (cname, posttime,editby, cstatus,cdatetime,locname,price,cdescription)
 
+
+-- Create View
+-- create view FutureConcert as 
+-- 	select * from Concert where cdatetime > now();
+-- create view PastConcert as 
+-- 	select * from Concert where cdatetime < now();
+
+
+drop table IF EXISTS RecommencList;
+drop table IF EXISTS ListFollower;
+drop table IF EXISTS UserRecommendList;
+drop table IF EXISTS ConcertRating;
+drop table IF EXISTS AttendConcert;
+drop table IF EXISTS FansOf;
+drop table IF EXISTS BandType;
+drop table IF EXISTS UserTaste;
+drop table IF EXISTS Subtype;
+drop table IF EXISTS Type;
+drop table IF EXISTS PlayBand;
+drop table IF EXISTS Userticket;
+drop table IF EXISTS ConcertProcess;
+drop table IF EXISTS Concert;
+drop table IF EXISTS Venues;
+drop table IF EXISTS BandMember;
+drop table IF EXISTS Artist;
+drop table IF EXISTS Band;
+drop table IF EXISTS Loginrecord;
+drop table IF EXISTS CUser;
+drop table IF EXISTS Follow;
 drop table IF EXISTS User;
+-- drop view IF EXISTS futureconcert; 
+-- drop view IF EXISTS pastconcert;
+
 CREATE table User(
-	username varchar(10) PRIMARY KEY,
+	username varchar(30) PRIMARY KEY,
 	name varchar(20),
 	password varchar(50) not NULL,
 	dob date default NULL,
@@ -48,65 +80,61 @@ CREATE table User(
 	registime datetime not NULL
 );
 
-drop table IF EXISTS Follow;
 CREATE table Follow(
-	username varchar(10), 
-	fusername varchar(10),
+	username varchar(30), 
+	fusername varchar(30),
 	ftime datetime not NULL,
 	PRIMARY KEY (username,fusername),
-	FOREIGN KEY (username, fusername) REFERENCES User(username)
+	FOREIGN KEY (username) REFERENCES User(username),
+	FOREIGN KEY (fusername) REFERENCES User(username)
+
 );
 
-drop table IF EXISTS CUser;
 create table CUser(
-	username varchar(10),
+	username varchar(30),
 	accumulogintime decimal(10,2),
 	score int(2),
 	PRIMARY KEY (username),
 	FOREIGN KEY (username) REFERENCES User(username)
 );
 
-drop table IF EXISTS Loginrecord;
 create table Loginrecord(
-	username varchar(10),
+	username varchar(30),
 	logintime datetime,
 	logouttime datetime,
 	PRIMARY KEY (username, logintime),
 	FOREIGN KEY (username) REFERENCES User(username)
 );
-drop table IF EXISTS Band;
+
 create table Band(
-	baname varchar(30),
+	baname varchar(50),
 	bbio text,
-	postby varchar(10) not null,
+	postby varchar(30) not null,
 	bptime datetime not null,
 	PRIMARY KEY (baname),
 	FOREIGN KEY (postby) REFERENCES User(username)
 );
 
-drop table IF EXISTS Artist;
 create table Artist(
-	username varchar(10),
+	username varchar(30),
 	verifystatus boolean not null default 0,
 	verifytime datetime,
 	verifyID varchar(10),
-	baname varchar(30), 
+	baname varchar(50), 
 	allowpost boolean not null default 1,
-	PRIMARY KEY (username, logintime),
+	PRIMARY KEY (username),
 	FOREIGN KEY (username) REFERENCES User(username),
 	FOREIGN KEY (baname) REFERENCES Band(baname)
 );
 
-drop table IF EXISTS BandMember;
 
 create table BandMember(
-	baname varchar(30),
-	bandmember varchar(10),
+	baname varchar(50),
+	bandmember varchar(30),
 	PRIMARY KEY (baname,bandmember),
 	FOREIGN KEY (baname) REFERENCES Band(baname)
 );
 
-drop table IF EXISTS Venues;
 create table Venues(
 	locname varchar(50),
 	address varchar(50),
@@ -117,7 +145,6 @@ create table Venues(
 	PRIMARY KEY (locname)
 );
 
-drop table IF EXISTS Concert;
 create table Concert(
 	cname varchar(50),
 	cdatetime datetime,
@@ -125,7 +152,7 @@ create table Concert(
 	price int(4),
 	availability int(5),
 	cdescription text,
-	cpostby varchar(10),
+	cpostby varchar(30),
 	cposttime datetime not null,
 	
 	ticketlink varchar(255),
@@ -133,12 +160,11 @@ create table Concert(
 	FOREIGN KEY (locname) REFERENCES Venues(locname),
 	FOREIGN KEY (cpostby) REFERENCES User(username)
 );
-ConcertProcess (cname, posttime,editby, cstatus, cdatetime,locname,price,cdescription)
-drop table IF EXISTS ConcertProcess;
+
 create table ConcertProcess(
 	cname varchar(50),
 	posttime datetime not null,
-	editby varchar(10),
+	editby varchar(30),
 	cstatus varchar(10),
 	cdatetime datetime,
 	locname varchar(50),
@@ -149,9 +175,9 @@ create table ConcertProcess(
 	FOREIGN KEY (cname) REFERENCES Concert(cname)
 
 );
-drop table IF EXISTS Userticket;
+
 create table Userticket(
-	username varchar(10),
+	username varchar(30),
 	cname varchar(50),
 	buytime datetime,
 	quantity int(3),
@@ -159,16 +185,14 @@ create table Userticket(
 	FOREIGN KEY (username) REFERENCES User(username)
 );
 
-drop table IF EXISTS PlayBand;
 create table PlayBand(
 	cname varchar(50),
-	baname varchar(30),
+	baname varchar(50),
 	PRIMARY KEY (baname, cname),
 	FOREIGN KEY (baname) REFERENCES Band(baname),
 	FOREIGN KEY (cname) REFERENCES Concert(cname)
 );
 
-drop table IF EXISTS Type;
 create table Type(
 	typename varchar(50),
 	typedecrip text,
@@ -176,7 +200,6 @@ create table Type(
 );
 
 
-drop table IF EXISTS Subtype;
 create table Subtype(
 	typename varchar(50),
 	subtypename varchar(50),
@@ -185,57 +208,47 @@ create table Subtype(
 	FOREIGN KEY (typename) REFERENCES Type(typename)
 );
 
-drop table IF EXISTS UserTaste;
 create table UserTaste(
-	username varchar(10),
+	username varchar(30),
 	typename varchar(50),
 	subtypename varchar(50),
 	PRIMARY KEY (username,typename,subtypename),
 	FOREIGN KEY (username) REFERENCES User(username),
-	FOREIGN KEY (typename) REFERENCES Type(typename),
-	FOREIGN KEY (subtypename) REFERENCES Subtype(subtypename)
+	FOREIGN KEY (typename,subtypename) REFERENCES Subtype(typename,subtypename)
 );
 
 
-drop table IF EXISTS BandType;
 create table BandType(
-	baname varchar(30),
+	baname varchar(50),
 	typename varchar(50),
 	subtypename varchar(50),
 	PRIMARY KEY (baname,typename,subtypename),
 	FOREIGN KEY (baname) REFERENCES Band(baname),
-	FOREIGN KEY (typename) REFERENCES Type(typename),
-	FOREIGN KEY (subtypename) REFERENCES Subtype(subtypename)
+	FOREIGN KEY (typename,subtypename) REFERENCES Subtype(typename,subtypename)
 );
 
 
-drop table IF EXISTS FansOf;
 create table FansOf(
-	username varchar(10),
-	baname varchar(30),
+	username varchar(30),
+	baname varchar(50),
 	fobtime datetime,
 	PRIMARY KEY (username, baname),
 	FOREIGN KEY (username) REFERENCES User(username),
 	FOREIGN KEY (baname) REFERENCES Band(baname)
 );
 
-drop table IF EXISTS AttendConcert;
 create table AttendConcert(
-	username varchar(10),
+	username varchar(30),
 	cname varchar(50),
 	decision varchar(10),
 	PRIMARY KEY (username, cname),
 	FOREIGN KEY (username) REFERENCES User(username),
 	FOREIGN KEY (cname) REFERENCES Concert(cname)
 );
-create view FutureConcert as 
-	select * from Concert where cdatetime > now();
-create view PastConcert as 
-	select * from Concert where cdatetime < now();
 
-drop table IF EXISTS ConcertRating;
+
 create table ConcertRating(
-	username varchar(10),
+	username varchar(30),
 	cname varchar(50),
 	rating int(2),
 	review text,
@@ -248,27 +261,24 @@ create table ConcertRating(
 
 
 
-drop table IF EXISTS UserRecommendList;
 create table UserRecommendList(
 	listname varchar(30),
-	username varchar(10),
+	username varchar(30),
 	lcreatetime datetime,
 	ldescription text,
 	PRIMARY KEY (listname),
 	FOREIGN KEY (username) REFERENCES User(username)
 );
 
-drop table IF EXISTS ListFollower;
 create table ListFollower(
 	listname varchar(30),
-	follower varchar(10),
+	follower varchar(30),
 	PRIMARY KEY (listname,follower),
 	FOREIGN KEY (follower) REFERENCES User(username),
 	FOREIGN KEY (listname) REFERENCES UserRecommendList(listname)
 );
 
 
-drop table IF EXISTS RecommencList;
 create table RecommencList(
 	listname varchar(30),
 	cname varchar(50),
@@ -278,16 +288,16 @@ create table RecommencList(
 );
 
 
-INSERT INTO User VALUES ('admin0','admin0','admin0','2000-08-30','admin@liveconcert.com','NY','2013-08-01 19:05:00');
+INSERT INTO User VALUES ('admin','admin','admin','2000-08-30','admin@liveconcert.com','NY','2013-08-01 19:05:00');
 INSERT INTO User VALUES ('suzie','suzie','suzie','2000-08-30','suzie@liveconcert.com','NY','2013-08-02 19:05:00');
 INSERT INTO User VALUES ('wendy','wendy','wendy','2000-08-30','wendy@liveconcert.com','NY','2013-08-03 19:05:00');
 INSERT INTO User VALUES ('Cat Power','Cat Power','catpower','2000-08-30','catpower@liveconcert.com','NY','2013-08-04 19:05:00');
 
 
-INSERT INTO Artist VALUES ('catpower',1,'2013-08-04 19:05:00','carpower','catpower');
 
 
-INSERT INTO Band VALUES ('Lykke Li','Lykke Li (Swedish pronunciation: [l.k li]; born Li Lykke Timotej Svensson Zachrisson; 18 March 1986) is a Swedish indie pop singer-songwriter. Her music often blends elements of indie pop, alternative, and electronic; instruments found in her songs include violins, synthesizers, tambourines, trumpets, saxophones, and cellos. Li possesses the vocal range of a soprano. Her debut album, Youth Novels, was released in 2008, her second album, Wounded Rhymes, was released in 2011, and her most recent album, I Never Learn, was released in 2014.\n','admin','2014-11-11 12:45:34');
+
+INSERT INTO Band VALUES ('Lykke Li','Lykke Li (Swedish pronunciation: [l.k li]; born Li Lykke Timotej Svensson Zachrisson; 18 March 1986) is a Swedish Indie Pop singer-songwriter. Her music often blends elements of Indie Pop, alternative, and electronic; instruments found in her songs include violins, synthesizers, tambourines, trumpets, saxophones, and cellos. Li possesses the vocal range of a soprano. Her debut album, Youth Novels, was released in 2008, her second album, Wounded Rhymes, was released in 2011, and her most recent album, I Never Learn, was released in 2014.\n','admin','2014-11-11 12:45:34');
 INSERT INTO Band VALUES ('The 1975','The 1975 are an English indie rock band formed based in Manchester. The group consists of Matt Healy (vocals, guitar), Adam Hann (guitar), George Daniel (drums, backing vocals) and Ross MacDonald (bass).
 They have released four EPs, while their self-titled debut album was released on 2 September 2013 through Dirty Hit/Polydor. The album debuted at No. 1 in the UK Albums Chart on 8 September 2013. The band have toured internationally and also played the 2014 Coachella festival.','admin','2014-11-11 12:45:34');
 INSERT INTO Band VALUES ('If These Trees Could Talk', 'If These Trees Could Talk is an instrumental post-rock band from Akron, Ohio. The band self-released their self-titled debut EP in 2006. Independent record label The Mylene Sheath re-released the EP in 2007, and went on to release the band\'s debut studio album, Above the Earth, Below the Sky, in 2009. The band self-released their second album Red Forest in March 2012, whilst the album\'s vinyl release went through Science of Silence Records.','admin','2014-11-11 12:45:34');
@@ -297,11 +307,9 @@ INSERT INTO Band VALUES ('Saxon Shore','Saxon Shore is an American post-rock ban
 Saxon Shore\'s overall sound has been compared to Caspian, Explosions in the Sky, Joy Wants Eternity, This Will Destroy You, and God is an Astronaut.','admin','2014-11-11 12:45:34');
 INSERT INTO Band VALUES ('Explosions In The Sky', 'Explosions in the Sky is an American post-rock band from Texas. The quartet originally played under the name Breaker Morant, then changed to the current name in 1999. The band has garnered popularity beyond the post-rock scene for their elaborately developed guitar work, narratively styled instrumentals, what they refer to as "cathartic mini-symphonies," and their enthusiastic and emotional live shows. They primarily play with three electric guitars and a drum kit, although band member Michael James will at times exchange his electric guitar for a bass guitar. Recently the band has added a fifth member to their live performances. The band\'s music is almost purely instrumental.
 ','admin','2014-11-11 12:45:34');
-INSERT INTO Band VALUES ('God Is An Astronaut','The band was formed in 2002 by twin brothers Niels and Torsten Kinsella, who took the inspiration for its name from a quote in the movie Nightbreed. God is an Astronaut\'s debut album The End of the Beginning was released in (2002) on the Revive Records label which is independently owned by the band. The album was intended to be a farewell to the industry. Two music videos for "The End of the Beginning" and "From Dust to the Beyond" produced by the band received airplay on MTV UK and on other MTV Europe networks.
-GIAA consider each of their albums to be a sonic photograph or snapshot of who we are in that moment of time. In mid 2006 a licensing deal with U.K. label Rocket Girl saw both EP, called A Moment of Stillness, and second album "All Is Violent, All Is Bright" being re-released. The single "Fragile" from the album received plays on MTV2 UK\'s 120 minute show and MTV\'s show The Comedown.','admin','2014-11-11 12:45:34');
 INSERT INTO Band VALUES ('This Will Destroy You','This Will Destroy You, often abbreviated to TWDY, is an American post-rock band from San Marcos, Texas, formed in 2005. The band consists of guitarists Jeremy Galindo and Chris King, bass player and keyboardist Donovan Jones and drummer Alex Bhore. They typically compose lengthy atmospheric instrumental pieces, featuring layers of effects-laden guitar and a heavy usage of dynamics.
 Their album, Tunnel Blanket, was released in May 2011. It entered the Billboard Heatseekers Album Chart at number 25.','admin','2014-11-11 12:45:34');
-INSERT INTO Band VALUES ('The xx','The xx are an English indie pop band formed in 2005 in Wandsworth, London. The group released their debut album, xx, in August 2009. The album ranked highly on many best of 2009 lists, placed at number one on the list compiled by The Guardian and second for NME. In 2010, the band won the Mercury Music Prize for their debut album. Their second album, Coexist, was released on 10 September 2012.','admin','2014-11-11 12:45:34');
+INSERT INTO Band VALUES ('The xx','The xx are an English Indie Pop band formed in 2005 in Wandsworth, London. The group released their debut album, xx, in August 2009. The album ranked highly on many best of 2009 lists, placed at number one on the list compiled by The Guardian and second for NME. In 2010, the band won the Mercury Music Prize for their debut album. Their second album, Coexist, was released on 10 September 2012.','admin','2014-11-11 12:45:34');
 INSERT INTO Band VALUES ('Belleruche','Belleruche was a three-piece electronic/soul band from the United Kingdom. They were signed on the Brighton based Tru Thoughts label.
 The band was formed in North London in 2005.
 Belleruche released a series of three limited 7" records on their own Hippoflex Recording Industries label before signing with Tru Thoughts, which sold out in British independent record stores and attracted a cult following in Europe, having been hand-distributed by the band at their gigs.
@@ -331,33 +339,32 @@ James has also released a number of EPs as AFX from 1991 to 2005 including the A
 INSERT INTO Band VALUES ('Nick Cave and the Bad Seeds','Nicholas Edward "Nick" Cave (born 22 September 1957) is an Australian musician, songwriter, author, screenwriter, composer and occasional film actor.
 He is best known for his work as lead singer of the rock band Nick Cave and the Bad Seeds, established in 1983, a group known for its eclectic influences and musical styles. Before that, he had fronted the group The Birthday Party in the early 1980s, a band renowned for its highly gothic, challenging lyrics and violent sound influenced by free jazz, blues, and punk. In 2006, he formed the garage rock band Grinderman, releasing its debut album the following year. Cave\'s music is generally characterised by emotional intensity, a wide variety of influences, and lyrical obsessions with religion, death, love and violence. In the early 2010s, he was dubbed by the NME as "the grand lord of gothic lushness".
 Upon Cave\'s induction into the ARIA Hall of Fame, ARIA Awards committee chairman Ed St John said, "Nick Cave has enjoyedand continues to enjoyone of the most extraordinary careers in the annals of popular music. He is an Australian artist like Sidney Nolan is an Australian artistbeyond comparison, beyond genre, beyond dispute."','admin','2014-11-11 12:45:34');
-INSERT INTO Band VALUES ('Sigur RÛs','JÛn ﬁÛr "JÛnsi" Birgisson (guitar and vocals), Georg HÛlm (bass) and ¡g˙st ∆var Gunnarsson (drums) formed the group in ReykjavÌk in January 1994. <http://instagram.com/p/iwEogVIcch/>  The band\'s name is Icelandic wordplay: while the individual words Sigur and RÛs mean, respectively, Victory and Rose, "Victory Rose" wouldn\'t be grammatically correct; the name is actually borrowed from JÛnsi\'s younger sister SigurrÛs, who was born a few days before the band was formed, and then split into two words. They soon won a record deal with the local Sugarcubes-owned record label, Bad Taste. In 1997, they released Von (pronounced [vn], meaning "hope") and in 1998 a remix collection named Von brigi ([vn pr]). This name is also Icelandic wordplay: Vonbrigi means "disappointment", but Von brigi means "variations on Von". The band was joined by Kjartan Sveinsson on keyboards in 1998. He is the only member of Sigur RÛs with musical training, and has contributed most of the orchestral and string arrangements for their later work.','admin','2014-11-11 12:45:34');
-INSERT INTO Band VALUES ('Mogwai','Mogwai (/mwa/) are a Scottish post-rock band, formed in 1995 in Glasgow. The band consists of Stuart Braithwaite (guitar, vocals), John Cummings (guitar, vocals), Barry Burns (guitar, piano, synthesizer, vocals), Dominic Aitchison (bass guitar), and Martin Bulloch (drums). The band typically compose lengthy guitar-based instrumental pieces that feature dynamic contrast, melodic bass guitar lines, and heavy use of distortion and effects. The band were for several years signed to renowned Glasgow indie label Chemikal Underground, and have been distributed by different labels such as Matador in the US and Play It Again Sam in the UK, but now use their own label Rock Action Records in the UK, and Sub Pop in North America. The band were frequently championed by John Peel from their early days, and recorded no fewer than seven Peel Sessions between 1996 and 2004. Peel also recorded a brief introduction for the compilation Government Commissions: BBC Sessions 19962003.','admin','2014-11-11 12:45:34');
+INSERT INTO Band VALUES ('Mogwai','Mogwaiare a Scottish post-rock band, formed in 1995 in Glasgow. The band consists of Stuart Braithwaite (guitar, vocals), John Cummings (guitar, vocals), Barry Burns (guitar, piano, synthesizer, vocals), Dominic Aitchison (bass guitar), and Martin Bulloch (drums). The band typically compose lengthy guitar-based instrumental pieces that feature dynamic contrast, melodic bass guitar lines, and heavy use of distortion and effects. The band were for several years signed to renowned Glasgow indie label Chemikal Underground, and have been distributed by different labels such as Matador in the US and Play It Again Sam in the UK, but now use their own label Rock Action Records in the UK, and Sub Pop in North America. The band were frequently championed by John Peel from their early days, and recorded no fewer than seven Peel Sessions between 1996 and 2004. Peel also recorded a brief introduction for the compilation Government Commissions: BBC Sessions 19962003.','admin','2014-11-11 12:45:34');
 INSERT INTO Band VALUES ('Maybeshewill','Maybeshewill was formed by guitarists Robin Southby and John Helps whilst the pair were studying together at university in 2005. They released their first record Japanese Spy Transcript on the band\'s own label, Robot Needs Home Records in 2006 with Tanya Byrne on bass guitar and Lawrie Malen on drums. The 4-track EP was well received by the press and attracted the attention of Nottingham\'s Field Records (also home to Public Relations Exercise) who released "The Paris Hilton Sex Tape" (taken from the record) as part of a split 7" single with Ann Arbor later that year. In August 2006 a re-mastered version of Japanese Spy Transcript was released in Japan on the XTAL label (also home to Yndi halda and You Slut!) which was set up specifically for the release by The Media Factory Group. Shortly after this release the band dissolved temporarily.','admin','2014-11-11 12:45:34');
 INSERT INTO Band VALUES ('The Abbasi Brothers','The Abrams Brothers are a Canadian band composed of fourth-generation musicians John Abrams and James Abrams.  Their music is a combination of bluegrass, country, and folk-rock with story-telling lyrics that has been called "newgrass." They have performed with acts such as John Hammond, Feist, and Dean Brody.','admin','2014-11-11 12:45:34');
 INSERT INTO Band VALUES ('Hammock','Hammock is an American two-member ambient/post-rock band from Nashville, Tennessee. With music initially created in between production and songwriting projects, Hammock combines live instrumentation, electronic beats, and droning guitar into atmospheric music similar in style to the work of Boards of Canada, Explosions in the Sky, and Stars of the Lid.','admin','2014-11-11 12:45:34');
 INSERT INTO Band VALUES ('S. Carey','S. Carey is the moniker of musician Sean Carey of Eau Claire, Wisconsin. Carey is best known as the drummer and supporting vocalist of indie folk band Bon Iver. In August 2010, Carey released his first solo album, All We Grow, which he began working on in 2008 during hiatuses from performing with the band.
-Comparisons have been drawn between Carey\'s harmonies and those of Brian Wilson in his 2004 album Smile. His music has also been likened to that of Sufjan Stevens, Fleet Foxes, Iron & Wine, JosÈ Gonz·lez, Steve Reich, and Talk Talk','admin','2014-11-11 12:45:34');
-INSERT INTO Band VALUES ('Caroline Smith and the Good Night Sleeps','Caroline Smith is originally from Detroit Lakes, Minnesota,[1] a town of about 8,600 according to the 2010 Census.[2] She began playing music at an early age, reportedly learning guitar from her father. At 16 she started performing publicly at Zorbaz Pizza in her hometown and opened for B.B. King as well as releasing a self-titled album.[3] Caroline has been quoted saying she prefers the guitar, more than other instruments, because of her ability to control the dynamics. She describes her voice as a "conglomerate" with countless influences ranging from Billie Holiday to Peter, Paul and Mary among others.','admin','2014-11-11 12:45:34');
+Comparisons have been drawn between Carey\'s harmonies and those of Brian Wilson in his 2004 album Smile. His music has also been likened to that of Sufjan Stevens, Fleet Foxes, Iron Wine, Steve Reich, and Talk Talk','admin','2014-11-11 12:45:34');
+INSERT INTO Band VALUES ('Caroline Smith and the Good Night Sleeps','Caroline Smith is originally from Detroit Lakes, Minnesota,[1] a town of about 8,600 according to the 2010 Census, She began playing music at an early age, reportedly learning guitar from her father. At 16 she started performing publicly at Zorbaz Pizza in her hometown and opened for B.B. King as well as releasing a self-titled album. Caroline has been quoted saying she prefers the guitar, more than other instruments, because of her ability to control the dynamics. She describes her voice as a "conglomerate" with countless influences ranging from Billie Holiday to Peter, Paul and Mary among others.','admin','2014-11-11 12:45:34');
 INSERT INTO Band VALUES ('The Cinematic Orchestra','The Cinematic Orchestra is a British nu-jazz and electronic music group, created in 1999 by Jason Swinscoe. The group is signed to independent record label Ninja Tune. In addition to Swinscoe, the band includes former DJ Food member PC (Patrick Carpenter) on turntables, Luke Flowers (drums), Tom Chant (saxophone), Nick Ramm (piano), Stuart McCallum (guitar) and Phil France (double bass). Former members include Jamie Coleman (trumpet), T. Daniel Howard (drums), Federico Ughi (drums), Alex James (piano), and Clean Sadness (synthesizer, programming). The most recent addition to the band is Mancunian guitarist Stuart McCallum. Swinscoe and Carpenter have also recorded together under the band name Neptune.
 ','admin','2014-11-11 12:45:34');
-INSERT INTO Band VALUES ('Sleepmakeswaves','Sleepmakeswaves (typeset as sleepmakeswaves) are an ARIA-nominated Australian post rock band who formed in Sydney, New South Wales in December 2006. The group is currently composed of guitarist Jonathan Khor, guitarist Otto Wicks-green, drummer Tim Adderley and bassist Alex Wilson. To date they have released one extended play (2008\'s In Today Already Walks Tomorrow) and two full length studio albums (2011\'s ...and so we destroyed everything & 2014\'s "Love Of Cartography"), as well as a split EP with Perth band Tangled Thoughts of Leaving and a remix album. The band have reached notable success internationally for their energetic live performances and modern approach to post rock. They are currently released through Australian independent record label Bird\'s Robe Records, which is distributed through MGM in Australia and independently worldwide. In 2013, UK label Monotreme Records licensed their debut album for an international release across the UK, Europe and North America.','admin','2014-11-11 12:45:34');
+INSERT INTO Band VALUES ('Sleepmakeswaves','Sleepmakeswaves (typeset as sleepmakeswaves) are an ARIA-nominated Australian post rock band who formed in Sydney, New South Wales in December 2006. The group is currently composed of guitarist Jonathan Khor, guitarist Otto Wicks-green, drummer Tim Adderley and bassist Alex Wilson. To date they have released one extended play (2008\'s In Today Already Walks Tomorrow) and two full length studio albums (2011\'s and so we destroyed everything & 2014\'s "Love Of Cartography"), as well as a split EP with Perth band Tangled Thoughts of Leaving and a remix album. The band have reached notable success internationally for their energetic live performances and modern approach to post rock. They are currently released through Australian independent record label Bird\'s Robe Records, which is distributed through MGM in Australia and independently worldwide. In 2013, UK label Monotreme Records licensed their debut album for an international release across the UK, Europe and North America.','admin','2014-11-11 12:45:34');
 INSERT INTO Band VALUES ('Ulrich Schnauss','Ulrich Schnauss was born in the northern German seaport of Kiel in 1977. He became interested in a range of music: My Bloody Valentine, Slowdive, Tangerine Dream, Chapterhouse, and early bleep & breakbeat tracks. There was not much opportunity to see his musical influences in Kiel, so he moved to Berlin in 1996.
 Ulrich\'s musical output began under the pseudonyms of View to the Future and Ethereal 77. These electronica and drum-driven pieces were noticed by Berlin electronica label CCO (City Centre Offices), to which Schnauss sent CD\'s on a regular basis. Ulrich developed these submissions to CCO into his first album under his own name, Far Away Trains Passing By, released in Europe in 2001, and in the United States in 2005.','admin','2014-11-11 12:45:34');
 INSERT INTO Band VALUES ('Epic45','epic45 are a British indie/post-rock band. Core members Rob Glover and Benjamin Holton, who grew up in Wheaton Aston, Staffordshire, formed the band in 1995 when the two school friends were only 13 years old. The band have released albums across various labels including Where Are My Records, Make Mine Music and their own Wayside and Woodland Recordings label.','admin','2014-11-11 12:45:34');
-INSERT INTO Band VALUES ('Cat Power','Charlyn Marie Marshall /ʃɑːrlɪn məri mɑːrʃəl/ [3] (born January 21, 1972), also known as Chan Marshall (/ʃɒn mɑːrʃəl/) or by her stage name Cat Power, is an American singer-songwriter, musician, occasional actress and model. Cat Power was originally the name of Marshall\'s first band, but has come to refer to her musical projects with various backing bands','admin','2014-11-11 12:45:34');
-INSERT INTO Band VALUES ('Feist','Leslie Feist (born 13 February 1976), known professionally as Feist, is a Canadian indie pop singer-songwriter, performing both as a solo artist and as a member of the indie rock group Broken Social Scene.
+INSERT INTO Band VALUES ('Cat Power','Charlyn Marie Marshall (born January 21, 1972), also known as Chan Marshall or by her stage name Cat Power, is an American singer-songwriter, musician, occasional actress and model. Cat Power was originally the name of Marshall\'s first band, but has come to refer to her musical projects with various backing bands','admin','2014-11-11 12:45:34');
+INSERT INTO Band VALUES ('Feist','Leslie Feist (born 13 February 1976), known professionally as Feist, is a Canadian Indie Pop singer-songwriter, performing both as a solo artist and as a member of the indie rock group Broken Social Scene.
 Feist launched her solo music career in 1999 with the release Monarch (Lay Your Jewelled Head Down). Her subsequent studio albums, Let It Die, released in 2004, and The Reminder, released in 2007, were critically acclaimed and commercially successful, selling over 2.5 million copies. The Reminder earned Feist four Grammy nominations, including a nomination for Best New Artist. She was the top winner at the 2008 Juno Awards in Calgary with five awards, including Songwriter of the Year, Artist of the Year, Pop Album of the Year, Album of the Year and Single of the Year. Her fourth studio album, Metals, was released on 30 September 2011. In 2012, Feist collaborated on a split EP with metal group Mastodon, releasing an interactive music video in the process.[2]','admin','2014-11-11 12:45:34');
-INSERT INTO Band VALUES ('Sharon Van Etten','Van Etten released a number of hand-designed and self-released recordings prior to her debut studio recording.[23][24] These were hand-painted designs she would sell on her website, as well as postcards, and sometimes t-shirts. She also worked as a publicist at Ba Da Bing Records in order to learn how the music industry worked, but didn\'t tell them that she was writing and performing music.[25] She got the job via a friend, Alicia Savoy, who she went to college with in Tennessee. She started out as an intern and worked her way up to being a full-time publicist.
+INSERT INTO Band VALUES ('Sharon Van Etten','Van Etten released a number of hand-designed and self-released recordings prior to her debut studio recording.These were hand-painted designs she would sell on her website, as well as postcards, and sometimes t-shirts. She also worked as a publicist at Ba Da Bing Records in order to learn how the music industry worked, but didn\'t tell them that she was writing and performing music. She got the job via a friend, Alicia Savoy, who she went to college with in Tennessee. She started out as an intern and worked her way up to being a full-time publicist.
 Van Etten said that Jeffrey Davison, a deejay on WFMU who has a show called Shrunken Planet, was the first person to play one of her homemade CDs on his show. Van Etten has become close to Davison and his wife, who have her over for record listening evenings','admin','2014-11-11 12:45:34');
 INSERT INTO Band VALUES ('Blonde Redhead','Blonde Redhead is an American alternative rock band composed of Kazu Makino (vocals, rhythm guitar) and twin brothers Simone and Amedeo Pace (drums/vocals and lead guitar, respectively) that formed in New York City in 1993.
 The band\'s earliest albums were noted for their noise rock influences, though their sound evolved by the early 2000s with the releases of Misery is a Butterfly (2004) and 23 (2007), which both incorporated elements of dream pop, shoegaze and other genres.','admin','2014-11-11 12:45:34');
-INSERT INTO Band VALUES ('Beach House is a dream pop duo from Baltimore, Maryland, formed in 2004. The band consists of French-born Victoria Legrand and Baltimore native Alex Scally.[1] Their self-titled debut album was released in 2006 to critical acclaim and has been followed by Devotion in 2008, Teen Dream in 2010, and Bloom in 2012.','','admin','2014-11-11 12:45:34');
-INSERT INTO Band VALUES ('Fiona Apple','Fiona Apple McAfee Maggart (born September 13, 1977) is an American singer-songwriter, pianist, and poet.[citation needed] Her debut album, Tidal, was released in 1996 and received a Grammy Award for Best Female Rock Vocal Performance (with an additional six nominations) for the single "Criminal". Born in New York, Apple is the daughter of singer Diane McAfee and actor Brandon Maggart.[6] Her maternal grandparents were dancer Millicent Green and big band vocalist Johnny McAfee. Her sister sings cabaret under the stage name Maude Maggart, and actor Garett Maggart is her half brother. Growing up, Apple spent her school years in New York City, but spent summers with her father in Los Angeles.[7] Apple was classically trained on piano as a child, and began composing her own pieces by the age of eight.[7] When learning to play piano, she would often take sheet music and translate guitar tablature into the corresponding notes.[7] Apple later began to play along with jazz standard compositions after becoming proficient, through which she discovered Billie Holliday and Ella Fitzgerald, who became major influences on her.','admin','2014-11-11 12:45:34');
+INSERT INTO Band VALUES ('Beach House','Beach House is a dream pop duo from Baltimore, Maryland, formed in 2004. The band consists of French-born Victoria Legrand and Baltimore native Alex Scally. Their self-titled debut album was released in 2006 to critical acclaim and has been followed by Devotion in 2008, Teen Dream in 2010, and Bloom in 2012.','admin','2014-11-11 12:45:34');
+INSERT INTO Band VALUES ('Fiona Apple','Fiona Apple McAfee Maggart (born September 13, 1977) is an American singer-songwriter, pianist, and poet.[citation needed] Her debut album, Tidal, was released in 1996 and received a Grammy Award for Best Female Rock Vocal Performance (with an additional six nominations) for the single "Criminal". Born in New York, Apple is the daughter of singer Diane McAfee and actor Brandon Maggart.Her maternal grandparents were dancer Millicent Green and big band vocalist Johnny McAfee. Her sister sings cabaret under the stage name Maude Maggart, and actor Garett Maggart is her half brother. Growing up, Apple spent her school years in New York City, but spent summers with her father in Los Angeles. Apple was classically trained on piano as a child, and began composing her own pieces by the age of eight.[7] When learning to play piano, she would often take sheet music and translate guitar tablature into the corresponding notes. Apple later began to play along with jazz standard compositions after becoming proficient, through which she discovered Billie Holliday and Ella Fitzgerald, who became major influences on her.','admin','2014-11-11 12:45:34');
 INSERT INTO Band VALUES ('band of horses','Band of Horses, originally known briefly as Horses, is an American rock band formed in 2004 in Seattle by Ben Bridwell. The band has released four studio albums, the most successful of which is 2010\'s Grammy-nominated Infinite Arms.The band\'s lineup, which included Mat Brooke for the debut album, has undergone several changes; although, the current members, Bridwell, Ryan Monroe, Tyler Ramsey, Bill Reynolds, and Creighton Barrett, have all been with the band for several years. Band of Horses\' fourth studio album, Mirage Rock, was released in September 2012.','admin','2014-11-11 12:45:34');
 INSERT INTO Band VALUES ('Kyte','Kyte comprise Nick Moon (vocals), Tom Lowe (guitars and keyboards), Scott Hislop (drums and percussion).Their earlier musical output was often labelled shoegazing (or neo-shoegazing) and post rock but they have since moved into a more electro and pop influenced sound.Their debut single, "Planet," was released in 2007 on Sonic Cathedral Recordings, the b-side of which, "Boundaries," was used in a trailer for the television series The Sopranos in the United States.[4] Their debut album was released in 2008 on Kids Records (UK) / Erased Tapes Records (EU) to generally positive reviews.In April 2009 they released their second full length release Science For The Living in Japan. The two disc Japan release featured tracks taken from their 2008 Two Sparks, Two Stars EP, with the remaining tracks being new material. The bonus disc included a remix from The Joy Formidable of the opening track on Disc 1, "Eyes Lose Their Fire."','admin','2014-11-11 12:45:34');
 INSERT INTO Band VALUES ('Eluvium','Eluvium is the moniker of the American ambient recording artist Matthew Cooper, who currently resides in Portland, Oregon. Cooper, who was born in Tennessee and raised in Louisville, Kentucky, before relocating to the Northwest, is known for blending various genres of experimental music including electronic, minimalism and piano. His albums often feature artwork and photographs by Jeannie Paske.','admin','2014-11-11 12:45:34');
-INSERT INTO Band VALUES ('Immanu El','Immanu El (post- / indie rock) from Gothenburg, Sweden, started as a musical experiment in 2004 by 16-year-old Claes Strängberg soon joined by his twin brother Per and friends David Lillberg, Jonatan Josefsson, and Robin Ausberg. The music have got its roots in the early post-rock scene and the ambition of the band has always been to create something captivating and beautiful, experimenting with other styles and elements with a lot of vocal arrangements. After touring, supporting such bands as Logh and Loney, Dear they got the chance in 2005 to play a set on the Rookie Stage in the Hultsfred Festival; an opportunity for unsigned bands to perform at a major event.[2] They released their first demo EP titled Killerwhale in 2005, before being signed to Swedish independent record label And the Sound Records and Japanese label Thomason Sounds (Inpartmaint) in 2007. The first full-length album They\'ll Come, They Come was released in August 2007 and the band moved from the outskirts of Jönköping to Gothenburg. The second album Moen was released 2009 after several tours in Europe during 2008. The band has gained a growing reputation to be one of the most promising bands from Scandinavia and performed over 300 shows in 30 countries (Europe, Asia and North America since the debut album was released. After four years on the Swedish west coast, their relationship with the sea has left a clear trace upon the latest album, which was released October 29th, 2011. During 2012/2013 Immanu El performed at SXSW in Austin, Reeperbahn Festival in Hamburg, Filter\'s Culture Collide Festival in LA, CMJ Music Marathon in New York, Canadian Music Week in Toronto and Strawberry Festival in Beijing and Shanghai. In May 2013, debut album They\'ll Come, They Come was released in a new edition by And The Sound Records and the German partner label Kapitän Platte. The band will continue touring but also start to work with a new album during 2013.','admin','2014-11-11 12:45:34');
+INSERT INTO Band VALUES ('Immanu El','Immanu El (postindie rock) from Gothenburg, Sweden, started as a musical experiment in 2004 by 16-year-old Claes Strängberg soon joined by his twin brother Per and friends David Lillberg, Jonatan Josefsson, and Robin Ausberg. The music have got its roots in the early post-rock scene and the ambition of the band has always been to create something captivating and beautiful, experimenting with other styles and elements with a lot of vocal arrangements. After touring, supporting such bands as Logh and Loney, Dear they got the chance in 2005 to play a set on the Rookie Stage in the Hultsfred Festival; an opportunity for unsigned bands to perform at a major event.[2] They released their first demo EP titled Killerwhale in 2005, before being signed to Swedish independent record label And the Sound Records and Japanese label Thomason Sounds (Inpartmaint) in 2007. The first full-length album They\'ll Come, They Come was released in August 2007 and the band moved from the outskirts of Jönköping to Gothenburg. The second album Moen was released 2009 after several tours in Europe during 2008. The band has gained a growing reputation to be one of the most promising bands from Scandinavia and performed over 300 shows in 30 countries (Europe, Asia and North America since the debut album was released. After four years on the Swedish west coast, their relationship with the sea has left a clear trace upon the latest album, which was released October 29th, 2011. During 2012/2013 Immanu El performed at SXSW in Austin, Reeperbahn Festival in Hamburg, Filter\'s Culture Collide Festival in LA, CMJ Music Marathon in New York, Canadian Music Week in Toronto and Strawberry Festival in Beijing and Shanghai. In May 2013, debut album They\'ll Come, They Come was released in a new edition by And The Sound Records and the German partner label Kapitän Platte. The band will continue touring but also start to work with a new album during 2013.','admin','2014-11-11 12:45:34');
 
 
 INSERT INTO BandMember VALUES ('If These Trees Could Talk','Tom Fihe');
@@ -393,10 +400,6 @@ INSERT INTO BandMember VALUES ('You Me At Six','Josh Franceschi');
 INSERT INTO BandMember VALUES ('You Me At Six','Chris Miller');
 INSERT INTO BandMember VALUES ('You Me At Six','Matt Barnes');
 INSERT INTO BandMember VALUES ('You Me At Six','Dan Flint');
-INSERT INTO BandMember VALUES ('God Is An Astronaut','Torsten Kinsella');
-INSERT INTO BandMember VALUES ('God Is An Astronaut','Niels Kinsella');
-INSERT INTO BandMember VALUES ('God Is An Astronaut','Jamie Dean');
-INSERT INTO BandMember VALUES ('God Is An Astronaut','Lloyd Hanney');
 INSERT INTO BandMember VALUES ('Mogwai','Stuart Braithwaite');
 INSERT INTO BandMember VALUES ('Mogwai','Dominic Aitchison');
 INSERT INTO BandMember VALUES ('Mogwai','Martin Bulloch');
@@ -410,7 +413,7 @@ INSERT INTO BandMember VALUES ('Saxon Shore','Stephen Roessner ');
 INSERT INTO BandMember VALUES ('Saxon Shore','Will Stichter');
 
 
-
+INSERT INTO Artist VALUES ('Cat Power',1,'2013-08-04 19:05:00','Car Power','Cat Power',1);
 
 INSERT INTO Venues VALUES ('Village Vanguard','178 7th Ave S','Manhattan','NY',1000,'http://www.villagevanguard.com');
 INSERT INTO Venues VALUES ('Union Hall','702 Union Street','Manhattan','NY',1000,'http://www.unionhallny.com');
@@ -437,7 +440,7 @@ INSERT INTO Type VALUES ('Folk','');
 
 INSERT INTO Subtype VALUES ('Blues','Classic Blues','');
 INSERT INTO Subtype VALUES ('Blues','Country Blues','');
-INSERT INTO Subtype VALUES ('Blues','Rhythm and Blues‎','');
+INSERT INTO Subtype VALUES ('Blues','Free Blues','');
 INSERT INTO Subtype VALUES ('Rock','Folk Rock','');
 INSERT INTO Subtype VALUES ('Rock','Hard Rock/Metal','');
 INSERT INTO Subtype VALUES ('Rock','Rock & Roll','');
@@ -468,8 +471,7 @@ INSERT INTO Subtype VALUES ('Electronic','Industrial','');
 INSERT INTO Subtype VALUES ('Country','Bluegrass','');
 INSERT INTO Subtype VALUES ('Country','Traditional Country','');
 INSERT INTO Subtype VALUES ('Country','Country Rock','');
-INSERT INTO Subtype VALUES ('Country','Country pop‎','');
-INSERT INTO Subtype VALUES ('Indie','Indie Pop‎','');
+INSERT INTO Subtype VALUES ('Indie','Indie Pop','');
 INSERT INTO Subtype VALUES ('Indie','Indie Rock','');
 INSERT INTO Subtype VALUES ('Reggae','Ska','');
 INSERT INTO Subtype VALUES ('Reggae','Roots Reggae','');
@@ -485,24 +487,24 @@ INSERT INTO BandType VALUES ('The 1975', 'R&B/Soul','R&B');
 
 INSERT INTO BandType VALUES ('Saxon Shore', 'Pop','Pop Rock');
 INSERT INTO BandType VALUES ('Saxon Shore', 'Rock','Post Rock');
-INSERT INTO BandType VALUES ('Saxon Shore', 'Indie Pop‎');
+INSERT INTO BandType VALUES ('Saxon Shore', 'Indie','Indie Pop');
 
 INSERT INTO BandType VALUES ('Explosions In The Sky', 'Pop','Pop Rock');
 INSERT INTO BandType VALUES ('Explosions In The Sky', 'Rock','Post Rock');
-INSERT INTO BandType VALUES ('Explosions In The Sky','Indie','Indie Rock')
+INSERT INTO BandType VALUES ('Explosions In The Sky','Indie','Indie Rock');
 INSERT INTO BandType VALUES ('This Will Destroy You', 'Rock','Post Rock');
 INSERT INTO BandType VALUES ('This Will Destroy You','Indie','Indie Rock');
 INSERT INTO BandType VALUES ('This Will Destroy You', 'R&B/Soul','Funk');
-INSERT INTO BandType VALUES ('The xx', 'Indie','Indie Pop‎');
+INSERT INTO BandType VALUES ('The xx', 'Indie','Indie Pop');
 INSERT INTO BandType VALUES ('The xx', 'Indie','Indie Rock');
-INSERT INTO BandType VALUES ('Belleruche','R&B/Soul','R&B/Soul');
+INSERT INTO BandType VALUES ('Belleruche','R&B/Soul','R&B');
 INSERT INTO BandType VALUES ('The Kooks','Rock','Post Puck');
 INSERT INTO BandType VALUES ('The Kooks','Rock','Rock & Roll');
 INSERT INTO BandType VALUES ('The Kooks','Pop','British Pop');
 INSERT INTO BandType VALUES ('The Kooks','R&B/Soul','Funk');
 INSERT INTO BandType VALUES ('The Kooks','Hip-Hop/Rap','Bounce');
 INSERT INTO BandType VALUES ('The Kooks','Reggae','Ska');
-INSERT INTO BandType VALUES ('The Kooks','Indie','Indie Pop‎');
+INSERT INTO BandType VALUES ('The Kooks','Indie','Indie Pop');
 INSERT INTO BandType VALUES ('CHVRCHES','Electronic','Drum & Bass');
 INSERT INTO BandType VALUES ('CHVRCHES','Pop','Electro Pop');
 INSERT INTO BandType VALUES ('Arctic Monkeys','Indie','Indie Rock');
@@ -532,8 +534,6 @@ INSERT INTO BandType VALUES ('Nick Cave and the Bad Seeds','Rock','Post Puck');
 INSERT INTO BandType VALUES ('Nick Cave and the Bad Seeds','Blues','Classic Blues');
 INSERT INTO BandType VALUES ('Nick Cave and the Bad Seeds','Blues','Country Blues');
 INSERT INTO BandType VALUES ('Nick Cave and the Bad Seeds','Electronic','Electronic Rock');
-INSERT INTO BandType VALUES ('Sigur RÛs','Rock','Post Rock');
-INSERT INTO BandType VALUES ('Sigur RÛs','Indie','Indie Rock');
 INSERT INTO BandType VALUES ('Mogwai','Rock','Post Rock');
 INSERT INTO BandType VALUES ('Mogwai','Indie','Indie Rock');
 INSERT INTO BandType VALUES ('Mogwai','Rock','Hard Rock/Metal');
@@ -563,11 +563,11 @@ INSERT INTO BandType VALUES ('Epic45','Indie','Indie Rock');
 INSERT INTO BandType VALUES ('Cat Power','Folk','Folk');
 INSERT INTO BandType VALUES ('Cat Power','Rock','Post Puck');
 INSERT INTO BandType VALUES ('Cat Power','Blues','Classic Blues');
-INSERT INTO BandType VALUES ('Cat Power','Blues','Rhythm and Blues‎');
+INSERT INTO BandType VALUES ('Cat Power','Blues','Free Blues');
 INSERT INTO BandType VALUES ('Feist','Folk','Folk');
 INSERT INTO BandType VALUES ('Feist','Rock','Post Puck');
 INSERT INTO BandType VALUES ('Feist','Indie','Indie Rock');
-INSERT INTO BandType VALUES ('Feist','Indie','Indie Pop‎');
+INSERT INTO BandType VALUES ('Feist','Indie','Indie Pop');
 INSERT INTO BandType VALUES ('Sharon Van Etten','Folk','Folk');
 INSERT INTO BandType VALUES ('Sharon Van Etten','Rock','Post Puck');
 INSERT INTO BandType VALUES ('Sharon Van Etten','Indie','Indie Rock');
@@ -577,7 +577,7 @@ INSERT INTO BandType VALUES ('Blonde Redhead','Blues','Classic Blues');
 INSERT INTO BandType VALUES ('Beach House','Indie','Indie Rock');
 INSERT INTO BandType VALUES ('Fiona Apple','Jazz','Free Jazz');
 INSERT INTO BandType VALUES ('Fiona Apple','Indie','Indie Rock');
-INSERT INTO BandType VALUES ('Fiona Apple','Post Puck');
+INSERT INTO BandType VALUES ('Fiona Apple','Rock','Post Puck');
 INSERT INTO BandType VALUES ('Fiona Apple','Pop','Pop Rock');
 INSERT INTO BandType VALUES ('Kyte','Rock','Post Rock');
 INSERT INTO BandType VALUES ('Kyte','Indie','Indie Rock');
