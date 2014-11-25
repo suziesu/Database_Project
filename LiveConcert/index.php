@@ -14,17 +14,25 @@
 <?php 
 $username = "";
 if(isset($_SESSION['username']) && $_SESSION['loggedin']){
-	head("Location: home.php");
+	header("Location: home.php");
 }
-
+if($_SERVER['REQUEST_METHOD']=='GET' && isset($_GET['username'])){
+	$username = $_GET['username'];
+}
 if($_SERVER["REQUEST_METHOD"]=='POST'){
-	if ($username = username_entered($_POST['username']) && $password = password_valid($_POST['password']){
-		if($userinfo = validate_user($username,$password)){
+	if(isset($_POST['username'])){
+		$username = $_POST['username'];
+	}
+	$username = username_entered($_POST['username']);
+	// $password = password_valid($_POST['password']);
+	if($username && $_POST['password']){
+		if($userinfo = validate_user($username,$_POST['password'])){
 			$_SESSION['username'] = $username;
 			$_SESSION['loggedin'] = true;
 			$_SESSION['score'] = $userinfo['score'];
-			if($loginrecord = $mysqli->query("call loginrecord($username)")){
-				$loginrecord->close();
+			$_SESSION['city'] = $userinfo['city'];
+			if($loginrecord = $mysqli->query("call loginrecord('$username')") or die($mysqli->error)){
+				// $loginrecord->close();
 				$mysqli->close();
 			}
 
@@ -37,9 +45,9 @@ if($_SERVER["REQUEST_METHOD"]=='POST'){
 ?>
 
 <div>
-<form id="login-register" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="POST">
+<form id="login-register" action='<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>' method="POST">
 <span class="error"><?php echo $msg; ?></span>	
-<span class="error"><?php echo $usernameERR; ?></span><input type="text" name="username" value="<?php echo htmlentities($username) ?>" placeholder="Username"/><br> 
+<span class="error"><?php echo $usernameERR; ?></span><input type="text" name="username" value="<?php echo htmlentities($username); ?>" placeholder="Username"/><br> 
 <span class="error"><?php echo $passwordERR; ?></span><input type="password" name="password" value='' placeholder="Password"/><br> 
 
 <input class="login_button" type='submit' name='submit' value="Log in"/>

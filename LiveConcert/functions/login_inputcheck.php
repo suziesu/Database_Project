@@ -36,7 +36,7 @@ function name_entered($name){
 		return false;
 	}else{
 		$name = clean_text($name);
-		return true;
+		return $name;
 	}
 }
 function dob_entered($dob){
@@ -46,8 +46,9 @@ function dob_entered($dob){
 		$dobERR = "dob is prefered for discount";
 		return false;
 	}else{
-		if($date = DateTime::createFromFormat('m/d/Y', $dob)){
+		if($date = DateTime::createFromFormat('Y-m-d', $dob)){
 			$birth = $date->format('Y-m-d');
+			echo $birth;
 			return $birth;
 		}else{
 			$dobERR = "the format is not correct";
@@ -70,7 +71,7 @@ function verifyID($id){
 		$verifyIDERR  = "verify Id needed for artist";
 		return false;
 	}else{
-		if(!preg_match('/^[a-zA-Z0-9]{10}$/', $password){
+		if(!preg_match('/^[a-zA-Z0-9]{10}$/', $password)){
 			$verifyIDERR  = "ID is not valid, 10 character";
 			return false;
 		}else{
@@ -106,7 +107,7 @@ function password_valid($password){
 				return False;
 
 			}else{
-				$password = password_hash($password,PASSWORD_DEFAULT);
+				$password = password_hash($password,PASSWORD_BCRYPT);
 				return $password;
 			}
 		}
@@ -114,26 +115,27 @@ function password_valid($password){
 
 //login user paswordcheck
 function validate_user($Tusername,$Tpassword){
-	global $passwordERR,$msg;
-
-	if($userlogin = $mysqli->query("call find_user_byname($username)")){
+	global $passwordERR, $msg, $mysqli;
+	if($userlogin = $mysqli->query("call find_user_byname('$Tusername')")){
+		echo "!23";
 		if($row = $userlogin->fetch_object()){
-			if($Tpassword == $row->password){
+			echo $row->password;
+			if(password_verify($Tpassword,$row->password)){
 				$userArray = array('username'=>$row->username,'score'=>$row->score,'city'=>$row->city);
 				$userlogin->close();
-				$mysqli->close();
+				$mysqli->next_result();
 				return $userArray;
 			}else{
 				$passwordERR = "password is not correct, please try again";
 				$userlogin->close();
-				$mysqli->close();
+				$mysqli->next_result();
 				return false;
 			}
 		}
 		else{
 			$msg = "User name cannot found, please sign up first";
 			$userlogin->close();
-			$mysqli->close();
+			$mysqli->next_result();
 			return false;
 		}
 		
@@ -142,19 +144,24 @@ function validate_user($Tusername,$Tpassword){
 
 //for registration username chack and other find user score info
 function find_user_by_username($Tusername){
-	global $usernameExist;
-	if($usersearch = $mysqli->query("call find_user_byname($username)")){
+	global $usernameExist,$mysqli, $usernameERR;
+	if($usersearch = $mysqli->query("call find_user_byname('$Tusername')") or die($mysqli->error)){
 		if($row = $usersearch->fetch_object()){
 			//register, echo the usernameExist
-			$usernameERR = "username is already exists, please change a new one";
+			$usernameERR = "username is already exists, <a href='index.php?username=$Tusername'>try login</a> ";
 			$userArray = array('username'=>$row->username,'city'=>$row->city,'score'=>$row->score);
 			$usersearch->close();
-			$mysqli->close();
+			$mysqli->next_result();
 			return $userArray;
 		}else{
+			$usersearch->close();
+			$mysqli->next_result();
 			return false;
 		}
 		
-	}	
+	}else{
+		echo "cannot find user";
+		return false;
+	}
 }
 ?>

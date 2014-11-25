@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-<?php include "includes/head.php"; 
+<?php include "../includes/head.php"; 
 $username = $_SESSION['username'];
-include "menu/home_menu.php";
+include "../menu/home_menu.php";
 ?>
 	<title>Following member</title>
 </head>
@@ -11,7 +11,7 @@ include "menu/home_menu.php";
 
 <?php
 echo "<a href='user_page.php?username=$username'><button type='button'>Go Back</button>";
-if($following = $mysqli->query("call following_list($username)")){
+if($following = $mysqli->query("call following_list('$username')") or die($mysqli->error)){
 	if($following->num_rows > 0){
 		while($row = $following->fetch_object()){
 			$fusername = $row->fusername;

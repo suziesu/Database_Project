@@ -1,5 +1,5 @@
 <?php
-$mysqli = new mysqli('localhost','root','','LiveConcert');
+$mysqli = new mysqli('localhost','root','','LiveConcert',0,'/tmp/mysql.sock');
 if(mysqli_connect_errno()){
 	printf("connect failed: %s\n",mysqli_connect_error());
 	exit();
@@ -14,8 +14,7 @@ if(isset($SESSION["REMOTE_ADDR"]) && $SESSION["REMOTE_ADDR"] != $SERVER["REMOTE_
 
 
 if(isset($_SESSION['error']) && $_SESSION['error']){
-	echo "<div class='error'>$_SESSION['error']</div>";
+	echo "<div class='error'>".$_SESSION['error']."</div>";
 	unset($_SESSION['error']);
 }
 ?> 
-<form action='".htmlspecialchars($_SERVER["PHP_SELF"])."' method='POST'>

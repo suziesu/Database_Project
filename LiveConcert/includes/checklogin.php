@@ -1,9 +1,9 @@
 <?php 
 if(isset($_SESSION['username']) && $_SESSION['loggedin']){
-	echo "Welcome ". $_SESSION['email'];
+	echo "Welcome ". $_SESSION['username'];
 }else{
 	$_SESSION['error'] = "Please log in!";
-	header('Location: login.php');
+	header('Location: index.php');
 
 }
 

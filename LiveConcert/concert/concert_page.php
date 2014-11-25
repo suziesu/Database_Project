@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
+<?php include "../includes/head.php"; 
+include $path."/LiveConcert/menu/home_menu.php";
+?>
 	<title></title>
 </head>
 <body>
@@ -25,14 +28,14 @@ if($_SERVER["REQUEST_METHOD"]=='GET'){
 		$cname = $_GET['cname'];
 		if(isset($_POST['review'])){
 			$reviewSubmit = $_POST['review'];
-			if($insertReview = $mysqli->query("call insert_review($username,$cname,$reviewSubmit)")){
+			if($insertReview = $mysqli->query("call insert_review('$username','$cname','$reviewSubmit')")){
 				$insertReview->close();
 				$review = false;
 			}
 		}
 		if(isset($_POST['rating-input-1'])){
 			$stars = count($_POST['rating-input-1']);
-			if($insertRating = $mysqli->query("call insert_rating($username,$cname,$stars)")){
+			if($insertRating = $mysqli->query("call insert_rating('$username','$cname',$stars)")){
 				$insertRating->close();
 			}
 
@@ -57,7 +60,7 @@ if($_SERVER["REQUEST_METHOD"]=='GET'){
 <!-- ticket -->
 	<span class="rating">
 	<?php 
-	if($getRate = $mysqli->query("call rating_by_user($username,$cname)")){
+	if($getRate = $mysqli->query("call rating_by_user('$username','$cname')")){
 		if($row = $getRate->fetch_object()){
 			$star = $row->rating;
 		}else{
@@ -89,7 +92,7 @@ if($_SERVER["REQUEST_METHOD"]=='GET'){
     </form>
     
 	<?php  
-	if($getReview = $mysqli->query("call concert_review($cname)")){
+	if($getReview = $mysqli->query("call concert_review('$cname')")){
 		if($getReview->num_rows > 0){
 			while($row = $getReview->fetch_object()){
 				echo $row->username.":".$row->reviewtime."<br>";

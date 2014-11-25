@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<?php include "includes/head.php";?>
+<?php include "../includes/head.php";?>
 	<title>Admin Artist Verification</title>
 </head>
 <body>
@@ -10,12 +10,16 @@ if($_SERVER["REQUEST_METHOD"]=='POST'){
 	$verifiedname = $_POST['username'];
 	if($_POST['verifyArtist'] == 'approve'){
 		
-		if($verify = $mysqli->query("call verify_artist($verifiedname)")){
-			$verify->close();
+		if($verify = $mysqli->query("call verify_artist('$verifiedname')")){
+			// $verify->close();
+			// $mysqli->next_result();
+			echo "success";
 		}
 	}else if($_POST['verifyArtist'] =='disapprove'){
-		if($disverify = $mysqli->query("call dis_verify_artist($verifiedname)")){
-			$disverify->close();
+		if($disverify = $mysqli->query("call dis_verify_artist('$verifiedname')")){
+			// $disverify->close();
+			// $mysqli->next_result();
+			echo "disapprove success";
 		}
 	}else{
 		$approveERR = "no choice";
@@ -28,7 +32,7 @@ if($unverify = $mysqli->prepare("select username,verifyID from Artist where veri
 	$unverify->bind_result($username,$verifyID);
 	while($unverify->fetch()){
 		echo "<form action='verify_artist.php' method='POST'>";
-		echo "<img scr=/LiveConcert/assets/img/".$username.".jpg/ height='42' width='42'> $username:$verifyID";
+		echo "<img scr=".$path."/LiveConcert/assets/img/".$username.".jpg/ height='42' width='42'> $username:$verifyID";
 		echo "<input type='hidden' name='username' value='$username'>";
 		echo "<input type='button' name='verifyArtist' value='approve'>";
 		echo "<input type='button' name='verifyArtist' value='disapprove'>";
@@ -36,6 +40,7 @@ if($unverify = $mysqli->prepare("select username,verifyID from Artist where veri
 		echo $approveERR;
 	}
 	$unverify->close();
+	$mysqli->next_result();
 }
 $mysqli->close();
 ?>

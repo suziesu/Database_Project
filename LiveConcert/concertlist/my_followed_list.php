@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-<?php include "includes/head.php"; ?>
+<?php include "../includes/head.php"; 
+include $path."/LiveConcert/menu/home_menu.php";?>
 	<title>My Followed List</title>
 </head>
 <body>
@@ -9,13 +10,14 @@
 $username = $_SESSION['username'];
 	if(isset($_POST['listname']) && isset($_POST['submit'])){
 		$listname = $_POST['listname'];
-		if($unfollow = $mysqli->query("call unfollow_recommenlist($listname)")){
+		if($unfollow = $mysqli->query("call unfollow_recommenlist('$listname')") or die($mysqli->error)){
 			$unfollow->close();
+			$mysqli->next_result();
 		}
 	}
 
 
-	if($result = $mysqli->query("call followed_recommend_list($username)")){
+	if($result = $mysqli->query("call followed_recommend_list('$username')") or die($mysqli->error)){
 		if($result->num_rows > 0){
 			while($row = $result->fetch_object()){
 				$fl = $row->listname;
