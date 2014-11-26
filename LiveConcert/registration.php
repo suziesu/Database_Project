@@ -19,21 +19,6 @@ $usernameinput = "";
 
 
 if($_SERVER['REQUEST_METHOD']=='POST'){
-	if(isset($_POST['username'])){
-		$usernameinput = $_POST['username'];
-	}
-	if(isset($_POST['name'])){
-		$nameinput =$_POST['name']; 
-	}
-	if(isset($_POST['dob'])){
-		$dobinput = $_POST['dob']; 
-	}
-	if(isset($_POST['email'])){
-		$emailinput = $_POST['email'];
-	}
-	if(isset($_POST['city'])){
-		$cityinput = $_POST['city'];
-	}
 	$usernameinput = username_entered($_POST['username']);
 	$nameinput =name_entered($_POST['name']); 
 	$dobinput = dob_entered($_POST['dob']); 
