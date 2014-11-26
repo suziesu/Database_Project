@@ -109,6 +109,7 @@ if($_SESSION['score'] >= 1){
 <!-- button of post band and post concert -->
 
 <div><h3>Concert</h3>
+<a href='/LiveConcert/concert/create_concert.php'><button>Create A Concert</button></a>
 	<div><h4>Plan To</h4>
 	<?php 
 		if($result = $mysqli->query("call plan_to_concert('$username')") or die($mysqli->error)){

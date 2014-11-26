@@ -1,6 +1,7 @@
 <?php 
 $cityERR =$dobERR = $nameERR= $usernameERR = $emailERR =$passwordERR =$msg= "";
 $verifyIDERR = "";
+$numberERR = "";
 // $username = $email = $password = "";
 // check if the email is entered and if the email is valid
 function email_entered($email){
@@ -48,12 +49,28 @@ function dob_entered($dob){
 	}else{
 		if($date = DateTime::createFromFormat('Y-m-d', $dob)){
 			$birth = $date->format('Y-m-d');
-			echo $birth;
 			return $birth;
 		}else{
 			$dobERR = "the format is not correct";
 			return false;
 		}
+	}
+}
+function date_time_check($datetime){
+	if(empty($datetime)){
+		return null;
+	}else{
+		if($date = DateTime::createFromFormat('d-m-Y H:i', $datetime)){
+			$output = $date->format('Y-m-d H:i:00');
+			return $output;
+		}
+	}
+}
+function null_allowed_input($input){
+	if(empty($input)){
+		return null;
+	}else{
+		return clean_text($input);
 	}
 }
 function city_entered($city){
@@ -162,6 +179,20 @@ function find_user_by_username($Tusername){
 	}else{
 		echo "cannot find user";
 		return false;
+	}
+}
+
+function number_check($number){
+	global $numberERR;
+	if(!empty($number)){
+		if (!preg_match('/^[0-9]+$/', $number)){
+			$numberERR = "Price only have numbers!";
+			return -1;
+		}else{
+			return $number;
+		}
+	}else{
+		return 0;
 	}
 }
 ?>

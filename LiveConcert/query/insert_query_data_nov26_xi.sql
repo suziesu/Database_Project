@@ -1,67 +1,4 @@
---LiveConcert_SQL
---author: Xi Su, Wen Fan
---version 1.0
---time Nov 08 2014
---CREATE table User(
--- 	username varchar(30) PRIMARY KEY,
--- 	name varchar(20),
--- 	dob date default NULL,
--- 	email varchar(50) default NULL,
--- 	city varchar(50) default NULL,
--- 	registime datetime not NULL,
---  PRIMARY KEY (sname,size),
--- FOREIGN KEY (sname) REFERENCES sandwich(sname)
--- );
--- Table Info:
--- User (username, name, password, dob, email, city, registime,score)
--- Follow (username, fusername, ftime)
--- Loginrecord(username, logintime, logouttime)
--- Artist (username, verifystatus, verifytime, verifiedID,baname, allowpost)
--- Band(baname, bbio, postby, bptime)
--- BandMember (baname, bandmember)
--- Venues (locname, address, city, state, capacity, web)
--- (Village Vanguard, Union Hall, 169 Bar, The Living Room, LE POISSON ROUGE,CAFE WHA,115 MacDougal,CLUB GROOVE)
--- Concert (cname, cdatetime, locname, price, availability, cdescription, cpostby, cposttime, ticketlink)
--- Userticket(username, cname, buytime,quantity)
--- PlayBand (cname, baname)
--- Type (typename, typedecrip)
--- Subtype (typename, subtypename, subtypedescrip)
--- UserTaste (username, typename, subtypename)
--- BandType (baname, typename, subtypename)
--- FansOf (username, baname, fobtime)
--- AttendConcert (username, cname, decision,actime)
--- ConcertRating (username, cname, rating, ratetime)
--- ConcertReview (username, cname, review,  reviewtime)
--- UserRecommendList (listname, username, lcreatetime, ldescription)
--- ListFollower (listname, follower)
--- RecommencList (listname, cname)
--- ConcertProcess (cname, posttime,editby, cstatus,cdatetime,locname,price,availability,cdescription)
--- PlayBandProcess(cname, baname)
 
--- create table PearsonSimilarity(
--- 	baname1 varchar(50),
---     baname2 varchar(50),
---     sumR1 int(10),
---     sumR2 int(10),
---     sumR1square int(10),
---     sumR2square int(10),
---     sumR1multiR2 int(10),
---     count int(10),
---     pearsonsimi decimal(8,3),
---     PRIMARY KEY (baname1,baname2),
--- 	FOREIGN KEY (baname1) REFERENCES Band(baname),
---     FOREIGN KEY (baname2) REFERENCES Band(baname)
--- );
-
--- create view UserRatingBand(username,baname,rating) as
--- select username, baname, avg(rating) from ConcertRating natural join PlayBand group by username,baname;
-
--- create view PearsonSimilarity(baname1, baname2, sumR1, sumR2,sumR1square,sumR2square,sumR1multiR2,count,pearsonsimi) as
--- 	select R1.baname, R2.baname, sum(R1.rating),sum(R2.rating), 
---     sum(R1.rating * R1.rating), sum(R2.rating*R2.rating), sum(R1.rating *R2.rating),count(*),0   
---     from UserRatingBand as R1, UserRatingBand as R2
---     where R1.username = R2.username
---     group by R1.baname, R2.baname;
 drop table IF EXISTS RecommendList;
 drop table IF EXISTS ListFollower;
 drop table IF EXISTS UserRecommendList;
@@ -180,7 +117,7 @@ create table ConcertProcess(
 	cdatetime datetime,
 	locname varchar(50),
 	price int(4),
-	availability int(5),
+    availability int(5),
 	cdescription text,
 	PRIMARY KEY (cname),
 	FOREIGN KEY (editby) REFERENCES User(username) ON DELETE CASCADE,

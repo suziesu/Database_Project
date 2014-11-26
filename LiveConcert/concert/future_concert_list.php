@@ -15,6 +15,7 @@ The system recommendation concert will be at explore page -->
 
 <?php
 $username = $_SESSION['username'];
+
 //get all typelist
 if($alltype = $mysqli->prepare("select typename from Type")){
 	$alltype->execute();
@@ -27,11 +28,11 @@ if($alltype = $mysqli->prepare("select typename from Type")){
 	echo "<table>";
 	foreach ($getAllType as $key) {
 		echo "<tr>";
-		echo "<td><a href='/LiveConcert/concert/concert_list.php?type=$key'>$key</a><td>";
+		echo "<td><a href='/LiveConcert/concert/future_concert_list.php?type=$key'>$key</a><td>";
 		if($allsubtype = $mysqli->query("call onetypeallsubtype('$key')")){
 			while($row = $allsubtype->fetch_object()){
 				$subtypename = $row->subtypename;
-				echo "<td><a href='/LiveConcert/concert/concert_list.php?type=$key&subtype=$subtypename'>$subtypename</td>";
+				echo "<td><a href='/LiveConcert/concert/future_concert_list.php?type=$key&subtype=$subtypename'>$subtypename</td>";
 			}
 			echo "</tr>";
 			$allsubtype->close();
@@ -42,12 +43,12 @@ if($alltype = $mysqli->prepare("select typename from Type")){
 }
 echo "<div><h3>Concert</h3>";
 
-//get subtype concert>
-echo "<a href='/LiveConcert/concert/future_concert_list.php'><button>Future Concert</button></a>";
+//get subtype concert
+echo "<a href='/LiveConcert/concert/concert_list.php'><button>All Concert</button></a>";
 if(isset($_GET['type']) && isset($_GET['subtype'])){
 	echo "<div>";
 	$subtype = $_GET['subtype'];
-	if($subtypeConcert = $mysqli->query("call get_subtype_all_concert('$subtype')") or die($mysqli->error)){
+	if($subtypeConcert = $mysqli->query("call get_subtype_future_concert('$subtype')") or die($mysqli->error)){
 		while($row = $subtypeConcert->fetch_object()){
 
 			$cname = $row->cname;
@@ -77,7 +78,7 @@ if(isset($_GET['type']) && isset($_GET['subtype'])){
 }else if(isset($_GET['type'])){
 	echo "<div>";
 	$type = $_GET['type'];
-	if($typeConcert = $mysqli->query("call get_type_all_concert('$type')")){
+	if($typeConcert = $mysqli->query("call get_type_future_concert('$type')")){
 		while($row = $typeConcert->fetch_object()){
 			$cname = $row->cname;
 			$cdatetime = $row->cdatetime;
@@ -102,7 +103,7 @@ if(isset($_GET['type']) && isset($_GET['subtype'])){
 //get all concert
 }else{
 	echo "<div>";
-	if($allConcert = $mysqli->query("call get_all_concert()")){
+	if($allConcert = $mysqli->query("call get_all_future_concert()")){
 		while($row = $allConcert->fetch_object()){
 			$cname = $row->cname;
 			$cdatetime = $row->cdatetime;

@@ -63,7 +63,30 @@ DROP PROCEDURE IF EXISTS be_fan;
 DROP PROCEDURE IF EXISTS un_fan;
 DROP PROCEDURE IF EXISTS remove_playband;
 DROP PROCEDURE IF EXISTS remove_whole_concert;
+DROP PROCEDURE IF EXISTS is_past_concert;
+DROP PROCEDURE IF EXISTS is_in_concert_process;
+DROP PROCEDURE IF EXISTS user_decision;
+DROP PROCEDURE IF EXISTS rated_concert_score;
+DROP PROCEDURE IF EXISTS get_recommend_list_from_cname;
+DROP PROCEDURE IF EXISTS process_concert_basic_info;
+DROP PROCEDURE IF EXISTS concert_loc_info;
+DROP PROCEDURE IF EXISTS concert_basic_info;
+DROP PROCEDURE IF EXISTS is_attended;
+DROP PROCEDURE IF EXISTS get_band_by_cname;
+DROP PROCEDURE IF EXISTS get_band_by_process_cname;
+DROP PROCEDURE IF EXISTS get_all_ticket_count_cn;
+DROP PROCEDURE IF EXISTS get_all_concert;
+DROP PROCEDURE IF EXISTS get_type_all_concert;
+DROP PROCEDURE IF EXISTS get_subtype_all_concert;
+DROP PROCEDURE IF EXISTS insert_to_attendconcert;
+DROP PROCEDURE IF EXISTS get_location_info;
+DROP PROCEDURE IF EXISTS create_concert;
+DROP PROCEDURE IF EXISTS create_concert_process;
+DROP PROCEDURE IF EXISTS create_play_band;
+DROP PROCEDURE IF EXISTS create_play_band_process;
+
 DELIMITER $$
+
 create procedure loginrecord(IN un varchar(30))
 begin
 	insert into  Loginrecord(username, logintime, logouttime) values (un,now(),null);
@@ -408,7 +431,106 @@ begin
 	end if;
     delete from Concert where cname = cn;
 end$$
+create procedure is_past_concert(cn varchar(50))
+begin
+	select * from Concert where cname =cn and cdatetime < now();
+end$$
+create procedure is_in_concert_process(cn varchar(50))
+begin
+	select * from ConcertProcess  where cname = cn;
+end$$
+create procedure user_decision(un varchar(30), cn varchar(50))
+begin
+	select * from AttendConcert where username = un and cname = cn;
+end$$
+create procedure rated_concert_score(un varchar(30), cn varchar(50))
+begin
+	select * from ConcertRating where username = un and cname = cn;
+end$$
+-- concert_info
+create procedure get_recommend_list_from_cname(cn varchar(50))
+begin
+
+	select * from RecommendList natural join UserRecommendList where cname = cn;
+end$$
+create procedure process_concert_basic_info(cn varchar(50))
+begin
+	select * from ConcertProcess where cname = cn;
+end$$
+create procedure concert_basic_info(cn varchar(50))
+begin
+	select * from Concert where cname = cn;
+end$$
+create procedure is_attended(un varchar(30),cn varchar(50))
+begin
+	select * from AttendConcert natural join pastconcert where cname = cn and decision = 'going';
+end$$
+create procedure concert_loc_info(loc varchar(50))
+begin
+	select * from Venues where locname = loc;
+end$$
+create procedure get_band_by_cname(cn varchar(50))
+begin
+	select * from PlayBand where cname = cn;
+end$$
+create procedure get_band_by_process_cname(cn varchar(50))
+begin
+	select * from PlayBandProcess where cname = cn;
+end$$
+create procedure get_all_ticket_count_cn(cn varchar(50))
+begin 
+	select sum(quantity) as count from Userticket where cname = cn;
+end$$
+
+create procedure get_all_concert()
+begin
+	select * from Concert;
+end$$
+
+create procedure get_type_all_concert(tp varchar(50))
+begin
+	select * from Concert where cname in (select cname from PlayBand natural join BandType where typename = tp); 
+end$$
+
+create procedure get_subtype_all_concert(subtp varchar(50))
+begin
+	select * from Concert where cname in (select cname from PlayBand natural join BandType where subtypename = subtp);
+end$$
+create procedure insert_to_attendconcert(un varchar(30), cn varchar(50),deci varchar(10))
+begin
+	insert into AttendConcert(username, cname, decision, actime) values (un, cn, deci,now());
+end$$
+create procedure get_location_info(loc varchar(50))
+begin
+	select * from Venues where locname = loc;
+end$$
+
+create procedure create_concert(cn varchar(50), cd datetime, loc varchar(50), pr int(4),avai int(5),cdes text,cp varchar(30),tick varchar(255) )
+begin 
+	insert into Concert (cname, cdatetime, locname, price, availability, cdescription, cpostby, cposttime, ticketlink) 
+    values (cn, cd, loc, pr, avai, cdes,cp,now(),tick);
+end$$
+
+create procedure create_concert_process(cn varchar(50), edit varchar(30),cd datetime,loc varchar(50),pr int(4), avai int(5), cdes text)
+begin
+	insert into ConcertProcess (cname, posttime,editby, cstatus,cdatetime,locname,price,availability,cdescription)
+    values (cn,now(),edit,'pending',cd,loc,pr,avai,cdes);
+end$$
+
+create procedure create_play_band(cn varchar(50),ba varchar(50))
+begin
+	insert into PlayBand(cname, baname) values (cn,ba);
+end$$
+create procedure create_play_band_process(cn varchar(50),ba varchar(50))
+begin
+	insert into PlayBandProcess(cname, baname) values (cn,ba);
+end$$
+
+
+
 DELIMITER ;
+
+
 
 
 
