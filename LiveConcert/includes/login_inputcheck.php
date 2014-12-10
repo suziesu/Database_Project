@@ -1,10 +1,10 @@
 <?php 
 $cityERR =$dobERR = $nameERR= $usernameERR = $emailERR =$passwordERR =$msg= "";
 $verifyIDERR = "";
-// $username = $email = $password = "";
+$username = $email = $password = "";
 // check if the email is entered and if the email is valid
 function email_entered($email){
-	global $emailERR, $passwordERR, $msg;
+	global $emailERR, $msg;
 	if(empty($email)){
 		$emailERR = "Email cannot be empty";
 		return false;
@@ -65,8 +65,9 @@ function city_entered($city){
 	}
 }
 function verifyID($id){
+	$password = $id;
 	global $verifyIDERR ;
-	if(empty($id)){
+	if(empty($password)){
 		$verifyIDERR  = "verify Id needed for artist";
 		return false;
 	}else{
@@ -74,42 +75,28 @@ function verifyID($id){
 			$verifyIDERR  = "ID is not valid, 10 character";
 			return false;
 		}else{
-			return $id;
+			return $password;
 		}
 	}
 }
 
-//for registration
-// function username_exist($Tusername){
-// 	if($usersearch = $mysqli->prepare("select username from User where username =?")){
-// 		$usersearch->bind_param('s',$Tusername);
-// 		$usersearch->execute();
-// 		$usersearch->bind_result($username);
-// 		if($usersearch->fetch){
-// 			$usernameERR = "username is already exists, please choose a new one";
-// 			$usersearch->close();
-// 			return True;
-// 		}
-// 	}
-// }
 
-//varify the password only use number and letters
-function password_valid($password){
+function password_valid($pd){
+	$password = $pd;
 	global $passwordERR;
 	if(empty($password)){
 			$passwordERR = "Password cannot be empty";
 			return false;
-		}else{
-			$password = clean_text($password);
-			if (!preg_match('/^[a-zA-Z0-9]+$/', $password)){
-				$passwordERR = "Only contain Letter and Numbers!";
-				return False;
+	}else{
+		$password_clean = clean_text($password);
+		if (!preg_match('/^[a-zA-Z0-9]+$/', $password_clean)){
+			$passwordERR = "Only contain Letter and Numbers!";
+			return False;
 
-			}else{
-				$password = password_hash($password,PASSWORD_DEFAULT);
-				return $password;
-			}
+		}else{
+			return password_hash($password_clean,PASSWORD_DEFAULT);
 		}
+	}
 }
 
 //login user paswordcheck

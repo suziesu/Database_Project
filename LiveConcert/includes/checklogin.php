@@ -1,10 +1,7 @@
 <?php 
-if(isset($_SESSION['username']) && $_SESSION['loggedin']){
-	echo "Welcome ". $_SESSION['username'];
-}else{
+if(!isset($_SESSION['username']) || !$_SESSION['loggedin']){
 	$_SESSION['error'] = "Please log in!";
-	header('Location: index.php');
-
+	header('Location: /LiveConcert/login.php');
 }
 
 ?>

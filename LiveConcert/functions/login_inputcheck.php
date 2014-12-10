@@ -22,7 +22,8 @@ function email_entered($email){
 function username_entered($username){
 	global $usernameERR;
 	if(empty($username)){
-		$username = "username cannot be empty";
+
+		$usernameERR = "username cannot be empty";
 		return false;
 	}else{
 		$username = clean_text($username);
@@ -88,7 +89,7 @@ function verifyID($id){
 		$verifyIDERR  = "verify Id needed for artist";
 		return false;
 	}else{
-		if(!preg_match('/^[a-zA-Z0-9]{10}$/', $password)){
+		if(!preg_match('/^[a-zA-Z0-9]{10}$/', $id)){
 			$verifyIDERR  = "ID is not valid, 10 character";
 			return false;
 		}else{

@@ -2,14 +2,17 @@
 <html>
 <head>
 	<script type="text/javascript" src="assets/js/jquery/jquery.js"></script>
-	<?php include "includes/head.php";
+	<?php include "includes/new_head.html";
+	include "includes/config.php";
 	include "functions/input_text_function.php";
 	include "functions/login_inputcheck.php";
 ?>
+	<link rel="stylesheet" type="text/css" href="/LiveConcert/assets/css/main1.css">
 </head>
 <body>
-<center><h1>LiveConcert</h1></center>
-<h2>Registration</h2>
+<!-- <style type="background:url(/LiveConcert/assets/images/background_2.jpg)"></style> -->
+<center><h2 id='registitle'>LIVE <img src="/LiveConcert/assets/images/Trecord1.gif"> CONCERT</h2>
+<h3>Registration</h3>
 <?php 
 $nameinput = "";
 $dobinput = "";
@@ -52,11 +55,14 @@ if($_SERVER['REQUEST_METHOD']=='POST'){
 				}
 
 				//if user is artist insert to artist table
-				if(!empty($_POST['artist'])){
-					if($idinput = verifyID($_POST['verifyID'])){
+				if(!empty($_POST['verifyID'])){
+					$pass =  $_POST['verifyID'];
+					if($idinput = verifyID($pass)){
+						echo "234";
+						echo $idinput;
 						$banameinput = "";
 						$allowpost = 0;
-						if(!empty($_POST['banameInDB'])){
+						if(!empty($_POST['banameInDB']) && $_POST['banameInDB']!='Find Your Band'){
 								$banameinput = $_POST['banameInDB'];
 						}else if(!empty($_POST['baname'])){
 								$banameinput = $_POST['baname'];
@@ -66,13 +72,18 @@ if($_SERVER['REQUEST_METHOD']=='POST'){
 						if(!empty($_POST['allowpost'])){
 							$allowpost = 1;
 						}
-						if($insertArtist = $mysqli->query("call insert_artist('$usernameinput','$idinput','$banameinput',$allowpost)")){
-							$insertArtist->close();
+						if($insertArtist = $mysqli->query("call insert_artist('$usernameinput','$idinput','$banameinput',$allowpost)") or die($mysqli->error)){
+							// $insertArtist->close();
+							$mysqli->next_result();
+							header("Location: index.php");
 						}
 					}
+				}else{
+					echo $verifyIDERR;
+					header("Location: index.php");
 				}
 				
-				header("Location: home.php");
+				
 			}else{
 				echo "insert error";
 			}
@@ -84,17 +95,36 @@ if($_SERVER['REQUEST_METHOD']=='POST'){
 }
 
 ?>
-<form id="login-register" method="POST" action='<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>'>
-	<span class="error"><br>* Required Field</span><br>
-	Username: <span class="error">* <?php echo $usernameERR; ?></span><input type="text" name="username" value="<?php echo htmlentities($usernameinput); ?>" placeholder="less than 30 chars">
-	Name: <span class="error">* <?php echo $nameERR; ?></span><input type="text" name="name" value="<?php echo $nameinput; ?>" placeholder="Real Name">
-	Password: <span class="error">* <?php echo $passwordERR; ?></span><input type="password" name="password" placeholder="only letters and numbers">
-	DOB: <span class="error">* <?php echo $dobERR; ?></span><input type="text" name="dob" value='<?php echo htmlentities($dobinput); ?>' placeholder="2014-11-11">
+<!-- <div class='registration'></div> -->
+<section class='content'>
+	<div class="container white-background " id='registration'>
+	<div id="registitle"></div>
 
-	Email: <span class="error">* <?php echo $emailERR; ?></span><input type="text" name="email" value="<?php echo htmlentities($emailinput); ?>" placeholder="Email Address">
-	City: <span class="error">* <?php echo $cityERR; ?></span><input type="text" name="city" value="<?php echo htmlentities($cityinput); ?>" placeholder="city name">
-	Music Genre You like:<br>
-	<table>
+		<div  class='row'> 
+<form  method="POST" action='<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>'>
+
+			<div class="span5">
+
+				<span >* Required Field</span>
+				<p>Username: * <span><?php echo $usernameERR; ?></span></p>
+				<p><input type="text" name="username" value="<?php echo htmlentities($usernameinput); ?>" placeholder="less than 30 chars"></p>
+				<p>Name: <span >* <?php echo $nameERR; ?></span></p>
+				<p><input type="text" name="name" value="<?php echo $nameinput; ?>" placeholder="Real Name"></p>
+				<p>Password: <span >* <?php echo $passwordERR; ?></span></p>
+				<p><input type="password" name="password" placeholder="only letters and numbers"></p>
+				<p>DOB: <span >* <?php echo $dobERR; ?></span></p>
+				<p><input type="text" name="dob" value='<?php echo htmlentities($dobinput); ?>' placeholder="2014-11-11"></p>
+
+				<p>Email: <span>* <?php echo $emailERR; ?></span></p>
+				<p><input type="text" name="email" value="<?php echo htmlentities($emailinput); ?>" placeholder="Email Address"></p>
+				<p>City: <span>* <?php echo $cityERR; ?></span></p>
+				<p><input type="text" name="city" value="<?php echo htmlentities($cityinput); ?>" placeholder="city name"></p>
+			</div>
+			<div class="span5">
+				<p>Music Genre You like:</p>
+	
+	
+	
 	<?php 
 	if($alltype = $mysqli->prepare("select typename from Type")){
 		$alltype->execute();
@@ -107,29 +137,31 @@ if($_SERVER['REQUEST_METHOD']=='POST'){
 		// for($x = 0; $x < count($getAllType); $x++){
 		foreach($getAllType as $key){
 			// $key = $getAllType[$x];
-			echo "<table><col align='left'><tr><td><input id='typename' type='checkbox' name='typename[]' value='$key'>$key: &nbsp;</td>";
+			echo "<ul><p><span id='type'><input id='typename' type='checkbox' name='typename[]' value='$key'>$key:</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 
 			if($allsubtype = $mysqli->query("call onetypeallsubtype('$key')") or die($mysqli->error)){
-				// echo "<tr><td>&nbsp;</td>";
+				// echo "<p>";
 				while($row = $allsubtype->fetch_object()){
 					$subtypename = $row->subtypename;
-					echo "<td><input id='$key' type='checkbox' name='subtype[]' value='$key".'|'."$subtypename'>$subtypename</td>";
+					echo "<input id='$key' type='checkbox' name='subtype[]' value='$key".'|'."$subtypename'>&nbsp;$subtypename&nbsp;&nbsp;";
 				}
-				echo "</tr>";
+				echo "</p></ul>";
 				$allsubtype->close();
 				$mysqli->next_result();
 			}
 		}
-		echo "</table>";		
+		// echo "</table>";		
 	}
 
 	?>
-	 </table>
-	<input id="artistcheck" type="checkbox" name="artist" value="">If you are an artist<br>
+	</div>
+	<div  class='row'> 
+	<p><input id="artistcheck" type="checkbox" name="artist" value="">If you are an artist	</p>
 	<div id='artist'>
-		VerifyID: <span class="error">* <?php echo $verifyIDERR; ?></span><input type="text" name="verifyID" placeholder="10 Chars">
+	<p>	VerifyID: <span>* <?php echo $verifyIDERR; ?></span>
+	<input type="text" name="verifyID" placeholder="10 Chars"/><p>
 
-		Band name: 
+		<p>Band name: 
 		<select name ='banameInDB'>
 		<option>Find Your Band</option>
 		<?php 
@@ -145,14 +177,22 @@ if($_SERVER['REQUEST_METHOD']=='POST'){
 				}
 			}
 			$mysqli->close();
-		?>
+		?></p>
 		</select><br>
-		If not exist, please type your bandname:
-		<input type="text" name="baname" placeholder="">
-		<input type="checkbox" name="allowpost" value='allow' checked='checked'>Allow Us to Post Concert
-	</div>
+		<p>If not exist, please type your bandname:</p>
+		<p><input type="text" name="baname" placeholder=""></p>
+	<p>	<input type="checkbox" name="allowpost" value='allow' checked='checked'>Allow Us to Post Concert</p>
+</div>
+		</div>
+		</div>
 	<input class="login_button" type="submit" name="registration" value="registration">
 
+	</form>
+	</div>
+</section>
+
+
+	
 	<script type="text/javascript">
 	$(document).ready(function(){
 		$('#artist').hide();

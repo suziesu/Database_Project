@@ -5,9 +5,8 @@
 	<?php 
 	include "../includes/regular_page_head.php";
 	include "../includes/concert_list_head.html";
-	
 ?>
-	<title>All Concert List</title>
+	<title>Past Concert List</title>
 <style type="text/css">
 	#tfheader{
 		background-color:#2e343e;
@@ -58,20 +57,22 @@
 </style>
 </head>
 <body id="page2">
+		<div class="extra">
 <body>
-<!-- this will show all the future concert
+<!-- this will show all the past concert
 
 also has genre type when people click is will show that type of concert
 
 The system recommendation concert will be at explore page -->
 
-
 <?php
 $username = $_SESSION['username'];
 $score = $_SESSION['score'];
+//get all typelist
+
 $concert_array = array();
 
-
+//Search bar
 if(isset($_POST['button'])){
 
 	if($_POST['button'] == 'Band'){
@@ -204,7 +205,6 @@ if(isset($_POST['button'])){
 	if($_POST['button'] == 'Name'){
 		if(isset($_POST['name'])){
 			$name = $_POST['name'];
-			//echo $name;
 			if($search_name = $mysqli->query("call search_concert_in_PC_by_name('$name')") or die($mysqli->error)){
 				//echo $search_name->num_rows;
 				while($row = $search_name->fetch_object()){
@@ -251,55 +251,11 @@ if(isset($_POST['button'])){
 			echo "no name input";
 		}
 	}
-
-
-
-
-
-
-	// $coname = name_entered($_POST['']);
- //    	if($selectConcert = $mysqli->query("call select_fconcert_name('$coname')")){
-	// 	while($row = $selectConcert->fetch_object()){
-	// 		$concert = array();
-	// 		$concert['cname'] = $row->cname;
-	// 		$concert['cdatetime'] = $row->cdatetime;
-	// 		$concert['locname'] = $row->locname;
-	// 		$concert['price'] = $row->price;
-	// 		$concert['cdescription'] = $row->cdescription;
-	// 		if($row->cstatus){
-	// 			$concert['cstatus'] = $row->cstatus;
-	// 		}else{
-	// 			$concert['cstatus'] = "";
-	// 		}
-	// 		$concert_array[] = $concert;
-
-	// 	}
-	// 	$selectConcert->close();
-	// 	$mysqli->next_result();
-
-	// }
-
-	// if($score >= 10){
-	// 	if($ConcertProcess = $mysqli->query("call get_all_future_onlyin_CP()") or die($mysqli->error)){
-	// 		while($row = $allConcertProcess->fetch_object()){
-	// 			$concert = array();
-	// 			$concert['cname'] = $row->cname;
-	// 			$concert['cdatetime'] = $row->cdatetime;
-	// 			$concert['locname'] = $row->locname;
-	// 			$concert['price'] = $row->price;
-	// 			$concert['cdescription'] = $row->cdescription;
-	// 			$concert['cstatus'] = $row->cstatus;
-	// 			$concert_array[] = $concert;
-	// 		}
-	// 		$allConcertProcess->close();
-	// 		$mysqli->next_result();
-	// 	}
-	// }
 }
 //get subtype concert>
-else if(isset($_GET['type']) && isset($_GET['subtype'])){
+if(isset($_GET['type']) && isset($_GET['subtype'])){
 	$subtype = $_GET['subtype'];
-	if($subtypeConcert = $mysqli->query("call get_subtype_future_concert('$subtype')") or die($mysqli->error)){
+	if($subtypeConcert = $mysqli->query("call get_subtype_past_concert('$subtype')") or die($mysqli->error)){
 		while($row = $subtypeConcert->fetch_object()){
 			$concert = array();
 			$concert['cname'] = $row->cname;
@@ -319,7 +275,7 @@ else if(isset($_GET['type']) && isset($_GET['subtype'])){
 
 	}
 	if($score >= 10){
-		if($subtypeConcertProcess = $mysqli->query("call get_subtype_future_onlyin_CP('$subtype')") or die($mysqli->error)){
+		if($subtypeConcertProcess = $mysqli->query("call get_subtype_past_onlyin_CP('$subtype')") or die($mysqli->error)){
 			while($row = $subtypeConcertProcess->fetch_object()){
 				$concert = array();
 				$concert['cname'] = $row->cname;
@@ -336,11 +292,9 @@ else if(isset($_GET['type']) && isset($_GET['subtype'])){
 		
 	}
 //get type concert
-}else{
-
- if(isset($_GET['type'])){
+}else if(isset($_GET['type'])){
 	$type = $_GET['type'];
-	if($typeConcert = $mysqli->query("call get_type_future_concert('$type')")){
+	if($typeConcert = $mysqli->query("call get_type_past_concert('$type')")){
 		while($row = $typeConcert->fetch_object()){
 			$concert = array();
 			$concert['cname'] = $row->cname;
@@ -353,13 +307,14 @@ else if(isset($_GET['type']) && isset($_GET['subtype'])){
 			}else{
 				$concert['cstatus'] = "";
 			}
+
 			$concert_array[] = $concert;
 		}
 		$typeConcert->close();
 		$mysqli->next_result();
 	}
 	if($score >= 10){
-		if($typeConcertProcess = $mysqli->query("call get_type_future_onlyin_CP('$type')") or die($mysqli->error)){
+		if($typeConcertProcess = $mysqli->query("call get_type_past_onlyin_CP('$type')") or die($mysqli->error)){
 			while($row = $typeConcertProcess->fetch_object()){
 				$concert = array();
 				$concert['cname'] = $row->cname;
@@ -377,7 +332,7 @@ else if(isset($_GET['type']) && isset($_GET['subtype'])){
 	}
 //get all concert
 }else{
-	if($allConcert = $mysqli->query("call get_all_future_concert()")){
+	if($allConcert = $mysqli->query("call get_all_past_concert()")){
 		while($row = $allConcert->fetch_object()){
 			$concert = array();
 			$concert['cname'] = $row->cname;
@@ -398,7 +353,7 @@ else if(isset($_GET['type']) && isset($_GET['subtype'])){
 //get
 	}
 	if($score >= 10){
-		if($allConcertProcess = $mysqli->query("call get_all_future_onlyin_CP()") or die($mysqli->error)){
+		if($allConcertProcess = $mysqli->query("call get_all_past_onlyin_CP()") or die($mysqli->error)){
 			while($row = $allConcertProcess->fetch_object()){
 				$concert = array();
 				$concert['cname'] = $row->cname;
@@ -414,14 +369,12 @@ else if(isset($_GET['type']) && isset($_GET['subtype'])){
 		}
 	}
 }
-}
 ?>
-<!-- search function -->
-	<body id="page2">
+<body id="page2">
 		<div class="extra">
 		<section id="tfheader">
-			<form id="tfnewsearch" method="POST" action="concert_list.php">
-				<!-- <tr><td>Search From Here:</td><td> -->
+			<form id="tfnewsearch" method="POST" action="past_concert_list.php">
+				<tr><td>Search From Here:</td><td>
 			<input type = "text" class="tftextinput" name="name" size="21" maxlength="80" value='' placeholder='input name' >
 				<input type="submit" name='button' value="Name" class="tfbutton">
 			<input type = "text" class="tftextinput" name="location" size="21" maxlength="80" value='' placeholder='input location'>
@@ -432,7 +385,6 @@ else if(isset($_GET['type']) && isset($_GET['subtype'])){
 				<input type="submit" name='button' value="Band" class="tfbutton">
 		</form>
 		</section>
-
 <!--==============================content================================-->
 			<section id="content">
 			<div id="sidebar">
@@ -446,12 +398,12 @@ else if(isset($_GET['type']) && isset($_GET['subtype'])){
 						}
 						$alltype->close();
 						foreach ($getAllType as $key) {
-							echo "<ul><a href='/LiveConcert/concert/concert_list.php?type=$key'>$key</a></ul>";
+							echo "<ul><a href='/LiveConcert/concert/past_concert_list.php?type=$key'>$key</a></ul>";
 							if($allsubtype = $mysqli->query("call onetypeallsubtype('$key')")){
 								// echo "<ul>";
 								while($row = $allsubtype->fetch_object()){
 									$subtypename = $row->subtypename;
-									echo "<li><a href='/LiveConcert/concert/concert_list.php?type=$key&subtype=$subtypename'>$subtypename</li>";
+									echo "<li><a href='/LiveConcert/concert/past_concert_list.php?type=$key&subtype=$subtypename'>$subtypename</li>";
 								}
 								$allsubtype->close();
 								$mysqli->next_result();
@@ -469,8 +421,8 @@ else if(isset($_GET['type']) && isset($_GET['subtype'])){
 							<div class="row">
 								<div class="col-full">
 									<div class="padding-grid-1">
-										<h3 class="letter">Our <strong>Concert &nbsp; &nbsp; &nbsp;&nbsp;&nbsp;
-										<a href='/LiveConcert/concert/past_concert_list.php'>Past Concert</a></span></strong></h3>
+										<h3 class="letter">Past <strong>Concert &nbsp; &nbsp; &nbsp;&nbsp;&nbsp;
+										<a href='/LiveConcert/concert/concert_list.php'>Future Concert</a></span></strong></h3>
 									</div>
 
 									<?php 
@@ -482,7 +434,7 @@ else if(isset($_GET['type']) && isset($_GET['subtype'])){
 													<div class='padding-grid-2'>
 														<div class='wrapper'>
 															<figure class='style-img-2 fleft'><a href='/LiveConcert/concert/concert_page.php?cname=$cname'>
-															<img height='250px' width='250px' src='/LiveConcert/assets/images/$cname.jpg' ></a></figure>
+															<img height='200px' width='200px' src='/LiveConcert/assets/images/$cname.jpg' ></a></figure>
 														</div>
 													</div>
 												</article>
@@ -524,8 +476,6 @@ else if(isset($_GET['type']) && isset($_GET['subtype'])){
 										</article>
 									</div>";
 								}
-								$mysqli->close();
-
 								?>
 								</div>
 							</div>
@@ -536,10 +486,10 @@ else if(isset($_GET['type']) && isset($_GET['subtype'])){
 			</section>
 		</div>
 
-		<script type="text/javascript"> Cufon.now(); 
-
-		</script>
+		<script type="text/javascript"> Cufon.now(); </script>
 	</body>
 </html>
 
+</body>
+</html>
 

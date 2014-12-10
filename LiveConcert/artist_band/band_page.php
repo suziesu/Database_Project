@@ -1,17 +1,25 @@
 <!DOCTYPE html>
 <html>
+<html>
 <head>
-<?php include "../includes/head.php"; 
-include $path."/LiveConcert/menu/home_menu.php";?>
+<?php 
+include "../includes/new_head.html"; 
+include "../includes/regular_page_head.php";
+?>
 	<title>Band Page</title>
 </head>
 <body>
+
+
 <?php 
 $username = $_SESSION['username'];
 $owner = "";
 $baname = "";
 $bptime = "";
 $fanOf = false;
+$bbio="";
+$bptime="";
+$owner="";
 	if(isset($_GET['baname'])){
 		$baname = $_GET['baname'];
 		if($bandinfo = $mysqli->query("call get_band_info('$baname')") or die($mysqli->error)){
@@ -75,55 +83,86 @@ $fanOf = false;
 		}
 	}else{
 		echo "no bandname is set";
-		header("Location: bandlist.php");
+		header("Location: band_list.php");
 	}
 	
 
 ?>
-<a href="/LiveConcert/artist_band/band_list.php"><button>Back To Band List</button></a>
-<div><img src="/LiveConcert/assets/images/<?php echo $baname; ?>.jpg"><h2><?php echo $baname; ?></h2></body></div>
+
+<section class='content'>
+<div class="container white-background">
+
+	<div id='user_info' class='row'>
+<a href='/LiveConcert/artist_band/band_list.php'><button id='create_concert'>Back To Band List</button></a>
+
+		<div  class="span7">
+
+
+
+
+<h3><?php echo $baname; ?></h3><h3><img src="/LiveConcert/assets/images/<?php echo $baname; ?>.jpg"></h3>
+<p id='margin-top'>
+
 <?php 
 	if($baname){
 		//ifi user is the owner he can edit and delete
 		if($username == $owner){
-			echo "<a href='edit_band.php?baname=$baname'><button>Edit Band</button></a>";
-			echo "<form action='".htmlspecialchars($_SERVER["PHP_SELF"])."' method='POST'><input type='hidden' name='baname' value='$baname'><input type='submit' name='submit' value='Delete Band'></a>";
+			echo "<p><a href='edit_band.php?baname=$baname'><button id='create_concert'>Edit Band</button></a></p>";
+			echo "<p><form action='".htmlspecialchars($_SERVER["PHP_SELF"])."' method='POST'><input type='hidden' name='baname' value='$baname'><input id='create_concert' type='submit' name='submit' value='Delete Band'></a></p>";
 		//if not he only can follow or not follow
 		}else{
 			if(!$fanOf){
-			echo "<form action='".htmlspecialchars($_SERVER["PHP_SELF"])."' method='POST'><input type='hidden' name='baname' value='$baname'><input type='submit' name='submit' value='Fan'></form>";
+			echo "<h3><form action='".htmlspecialchars($_SERVER["PHP_SELF"])."' method='POST'><input type='hidden' name='baname' value='$baname'><input id='submit' type='submit' name='submit' value='Fan'></form></h3>";
 			//already followed but not the creator show followed button
 			}else{
-				echo "<button color='grey' type='button'>Followed</button>";
-				echo "<form action='".htmlspecialchars($_SERVER["PHP_SELF"])."' method='POST'><input type='hidden' name='baname' value='$baname'><input type='submit' name='submit' value='UnFan'></form>";
+				echo "<h3><button color='white' type='button'>Followed</button>";
+				echo "<p><form action='".htmlspecialchars($_SERVER["PHP_SELF"])."' method='POST'><input type='hidden' name='baname' value='$baname'><input id='create_concert' type='submit' name='submit' value='UnFan'></form></h3>";
 			}
 		}
 		//get band tpe 
-		echo "<div><h4>Band Type</h4><ul>";
+		echo "<p >Band Type</p>";
 		if($bandtp = $mysqli->query("call get_band_type('$baname')") or die($mysqli->error)){
-			while($row = $bandtp->fetch_object()){
-				$subtype = $row->subtypename;
-				echo "<a href='/LiveConcert/genre/genre_type_page.php?subtype=$subtype'>$subtype</a>&nbsp;";
-			}
+			if($bandtp->num_rows > 0){
+				echo "<li id='margin-left'>";
+				while($row = $bandtp->fetch_object()){
+					$subtype = $row->subtypename;
+					echo "<a href='/LiveConcert/genre/genre_type_page.php?subtype=$subtype'>$subtype</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+				}
+			}echo "</li>";
 			$bandtp->close();
 			$mysqli->next_result();
 		}
-		echo "</ul></div>";
-
+		echo "</div>";
 		//get band Member
-		echo "<div><h3>Band Member</h3><ul>";
+		echo "<div class='span3' >
+
+		<h3>Band Member</h3>";
 		if($bandmem = $mysqli->query("call get_band_member('$baname')") or die($mysqli->error)){
-			while($row = $bandmem->fetch_object()){
-				$member = $row->bandmember;
-				echo "<a href='/LiveConcert/user/user_page.php?username=$member'>$member</a>";
+			echo "<h6>";
+			if($bandmem->num_rows > 0){
+				while($row = $bandmem->fetch_object()){
+					$member = $row->bandmember;
+					echo "<li><a href='/LiveConcert/user/user_page.php?username=$member'>$member</a></li>";
+				}
+				
 			}
+			echo "</h6>";
 			$bandmem->close();
 			$mysqli->next_result();
+			
 		}
 
-		echo "</ul></div>";
+		echo "
+		</p></div></div>";
 		//get band concert
-		echo "<div><h3>Upcoming Concert</h3>";
+		echo "<div class='row' id='concert'>";
+		echo "<h2>Bio</h2>";
+		 echo "<p>".$bbio."</p>"; 
+		 echo "</div>";
+		echo "<div class='row' id='concert'>
+
+		<h2>Upcoming Concert</h2>
+		";
 		if($upconing = $mysqli->query("call get_band_future_concert('$baname')") or die($mysqli->error)){
 			if($upconing->num_rows > 0){
 				while($row = $upconing->fetch_object()){
@@ -133,25 +172,33 @@ $fanOf = false;
 					$price = $row->price;
 					$postby = $row->cpostby;
 					$cdescrib = $row->cdescription;
+					echo "<div class='span3' >";
 					echo "<div><a href='/LiveConcert/concert/concert_page.php?cname=$concert'><img src='/LiveConcert/assets/images/$concert.jpg'>";
-					echo "<h4>".$concert."</h4><span>$cdatetime</span>";
+					echo "<h4>".$concert."</h4><h6>$cdatetime";
 					echo $locname;
-					echo "</a></div>";
-					echo "<div><ul>$cdescrib</ul><div>";
+					echo "</a></h6></div>";
+					echo "<ul>$cdescrib</ul>";
 					//remove concert button
 					if($username == $postby){
-						echo "<a href='/LiveConcert/edit_concert.php?cname=$concert'><button>Edit</button></a>";
-						echo "<form action='".htmlspecialchars($_SERVER["PHP_SELF"])."' method='POST' onsubmit='return confirm("."'Are you sure you want to remove?'".");'><input type='hidden' name='baname' value='$baname'><input type='hidden' name='cname' value='$concert'><input type='submit' name='submit' value='Remove Concert'></form>";
+						echo "<p id='edit'><a href='/LiveConcert/edit_concert.php?cname=$concert'><button id='submit'>Edit</button></a></p>";
+						echo "<p id='edit'><form action='".htmlspecialchars($_SERVER["PHP_SELF"])."' method='POST' onsubmit='return confirm("."'Are you sure you want to remove?'".");'><input type='hidden' name='baname' value='$baname'><input type='hidden' name='cname' value='$concert'><input id='create_concert' type='submit' name='submit' value='Remove Concert'></form></p>";
 					}
+					echo "</div>";
 				}
-				$upconing->close();
-				$mysqli->next_result();
+				
 			}
+			$upconing->close();
+			$mysqli->next_result();
 		}
 
 		echo "</div>";
-		echo "<div><h3>Past Concert</h3></h3>";
+
+		echo "<div class='row' id='concert'>
+
+		<h2>Past Concert</h2>";
+
 		if($past = $mysqli->query("call get_band_past_concert('$baname')") or die($mysqli->error)){
+			
 			if($past->num_rows > 0){
 				while($row = $past->fetch_object()){
 					$concert = $row->cname;
@@ -160,27 +207,33 @@ $fanOf = false;
 					$price = $row->price;
 					$postby = $row->cpostby;
 					$cdescrib = $row->cdescription;
-					echo "<div><a href='/LiveConcert/concert/concert_page.php?cname=$concert'><img src='/LiveConcert/assets/images/$concert.jpg'>";
+					echo "<div class='span3' >";
+					echo "<a href='/LiveConcert/concert/concert_page.php?cname=$concert'><img src='/LiveConcert/assets/images/$concert.jpg'>";
 					echo "<h4>".$concert."</h4><span>$cdatetime</span>";
-					echo $locname;
-					echo "</a></div>";
-					echo "<div><ul>$cdescrib</ul><div>";
+					echo "<p>".$locname."</p>";
+					echo "</a>";
+					echo "<p><ul>$cdescrib</ul></p>";
 					//remove concert button
 					if($username == $postby){
-						echo "<a href='/LiveConcert/edit_concert.php?cname=$concert'><button>Edit</button></a>";
+						echo "<a href='/LiveConcert/edit_concert.php?cname=$concert'><button id='submit'>Edit</button></a>";
 					}
+					echo "</div>";
 				}
-				$past->close();
-				$mysqli->next_result();
+				
 			}
+			$past->close();
+			$mysqli->next_result();
 		}
 		echo "</div>";
 		
 	}else{
 		echo "no band is choosen";
 	}
+	$mysqli->close();
 
 ?>
-<a href="/LiveConcert/artist_band/band_list.php"><button>Back To Band List</button></a>
+<div class='row' id='concert'>
+<h3><a href="/LiveConcert/artist_band/band_list.php"><button id='create_concert'>Back To Band List</button></a></h3>
+</div>
 </body>
 </html>

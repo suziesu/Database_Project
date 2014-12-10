@@ -41,8 +41,8 @@ CREATE table Follow(
 	fusername varchar(30),
 	ftime datetime not NULL,
 	PRIMARY KEY (username,fusername),
-	FOREIGN KEY (username) REFERENCES User(username) ON DELETE CASCADE,
-	FOREIGN KEY (fusername) REFERENCES User(username) ON DELETE CASCADE
+	FOREIGN KEY (username) REFERENCES User(username) ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY (fusername) REFERENCES User(username) ON DELETE CASCADE ON UPDATE CASCADE
 
 );
 
@@ -52,7 +52,7 @@ create table Loginrecord(
 	logintime datetime,
 	logouttime datetime,
 	PRIMARY KEY (username, logintime),
-	FOREIGN KEY (username) REFERENCES User(username) ON DELETE CASCADE
+	FOREIGN KEY (username) REFERENCES User(username) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 create table Band(
@@ -61,7 +61,7 @@ create table Band(
 	postby varchar(30) not null,
 	bptime datetime not null,
 	PRIMARY KEY (baname),
-	FOREIGN KEY (postby) REFERENCES User(username) ON DELETE CASCADE
+	FOREIGN KEY (postby) REFERENCES User(username) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 create table Artist(
@@ -72,7 +72,7 @@ create table Artist(
 	baname varchar(50), 
 	allowpost boolean not null default 1,
 	PRIMARY KEY (username),
-	FOREIGN KEY (username) REFERENCES User(username) ON DELETE CASCADE
+	FOREIGN KEY (username) REFERENCES User(username) ON DELETE CASCADE ON UPDATE CASCADE
 	-- FOREIGN KEY (baname) REFERENCES Band(baname) ON DELETE CASCADE
 );
 
@@ -81,7 +81,7 @@ create table BandMember(
 	baname varchar(50),
 	bandmember varchar(30),
 	PRIMARY KEY (baname,bandmember),
-	FOREIGN KEY (baname) REFERENCES Band(baname) ON DELETE CASCADE
+	FOREIGN KEY (baname) REFERENCES Band(baname) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 create table Venues(
@@ -105,8 +105,8 @@ create table Concert(
 	cposttime datetime not null,
 	ticketlink varchar(255),
 	PRIMARY KEY (cname),
-	FOREIGN KEY (locname) REFERENCES Venues(locname) ON DELETE CASCADE,
-	FOREIGN KEY (cpostby) REFERENCES User(username) ON DELETE CASCADE
+	FOREIGN KEY (locname) REFERENCES Venues(locname) ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY (cpostby) REFERENCES User(username) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 create table ConcertProcess(
@@ -120,8 +120,8 @@ create table ConcertProcess(
     availability int(5),
 	cdescription text,
 	PRIMARY KEY (cname),
-	FOREIGN KEY (editby) REFERENCES User(username) ON DELETE CASCADE,
-	FOREIGN KEY (locname) REFERENCES Venues(locname) ON DELETE CASCADE
+	FOREIGN KEY (editby) REFERENCES User(username) ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY (locname) REFERENCES Venues(locname) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 create table Userticket(
@@ -130,22 +130,22 @@ create table Userticket(
 	buytime datetime,
 	quantity int(3),
 	PRIMARY KEY (username,cname,buytime),
-	FOREIGN KEY (username) REFERENCES User(username) ON DELETE CASCADE
+	FOREIGN KEY (username) REFERENCES User(username) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 create table PlayBand(
 	cname varchar(50),
 	baname varchar(50),
 	PRIMARY KEY (baname, cname),
-	FOREIGN KEY (baname) REFERENCES Band(baname) ON DELETE CASCADE,
-	FOREIGN KEY (cname) REFERENCES Concert(cname) ON DELETE CASCADE
+	FOREIGN KEY (baname) REFERENCES Band(baname) ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY (cname) REFERENCES Concert(cname) ON DELETE CASCADE ON UPDATE CASCADE
 );
 create table PlayBandProcess(
 	cname varchar(50),
 	baname varchar(50),
 	PRIMARY KEY (baname, cname),
-	FOREIGN KEY (baname) REFERENCES Band(baname) ON DELETE CASCADE,
-	FOREIGN KEY (cname) REFERENCES ConcertProcess(cname) ON DELETE CASCADE
+	FOREIGN KEY (baname) REFERENCES Band(baname) ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY (cname) REFERENCES ConcertProcess(cname) ON DELETE CASCADE ON UPDATE CASCADE
 );
 create table Type(
 	typename varchar(50),
@@ -159,7 +159,7 @@ create table Subtype(
 	subtypename varchar(50),
 	subtypedescrip text,
 	PRIMARY KEY (typename, subtypename),
-	FOREIGN KEY (typename) REFERENCES Type(typename) ON DELETE CASCADE
+	FOREIGN KEY (typename) REFERENCES Type(typename) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 create table UserTaste(
@@ -167,8 +167,8 @@ create table UserTaste(
 	typename varchar(50),
 	subtypename varchar(50),
 	PRIMARY KEY (username,typename,subtypename),
-	FOREIGN KEY (username) REFERENCES User(username) ON DELETE CASCADE,
-	FOREIGN KEY (typename,subtypename) REFERENCES Subtype(typename,subtypename) ON DELETE CASCADE
+	FOREIGN KEY (username) REFERENCES User(username) ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY (typename,subtypename) REFERENCES Subtype(typename,subtypename) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 
@@ -177,8 +177,8 @@ create table BandType(
 	typename varchar(50),
 	subtypename varchar(50),
 	PRIMARY KEY (baname,typename,subtypename),
-	FOREIGN KEY (baname) REFERENCES Band(baname) ON DELETE CASCADE,
-	FOREIGN KEY (typename,subtypename) REFERENCES Subtype(typename,subtypename) ON DELETE CASCADE
+	FOREIGN KEY (baname) REFERENCES Band(baname) ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY (typename,subtypename) REFERENCES Subtype(typename,subtypename) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 
@@ -187,8 +187,8 @@ create table FansOf(
 	baname varchar(50),
 	fobtime datetime,
 	PRIMARY KEY (username, baname),
-	FOREIGN KEY (username) REFERENCES User(username) ON DELETE CASCADE,
-	FOREIGN KEY (baname) REFERENCES Band(baname) ON DELETE CASCADE
+	FOREIGN KEY (username) REFERENCES User(username) ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY (baname) REFERENCES Band(baname) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 create table AttendConcert(
@@ -197,8 +197,8 @@ create table AttendConcert(
 	decision varchar(10),
 	actime datetime,
 	PRIMARY KEY (username, cname),
-	FOREIGN KEY (username) REFERENCES User(username) ON DELETE CASCADE,
-	FOREIGN KEY (cname) REFERENCES Concert(cname) ON DELETE CASCADE
+	FOREIGN KEY (username) REFERENCES User(username) ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY (cname) REFERENCES Concert(cname) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 
@@ -208,8 +208,8 @@ create table ConcertRating(
 	rating int(2),
 	ratetime datetime,
 	PRIMARY KEY (username, cname, ratetime),
-	FOREIGN KEY (username) REFERENCES User(username) ON DELETE CASCADE,
-	FOREIGN KEY (cname) REFERENCES Concert(cname) ON DELETE CASCADE
+	FOREIGN KEY (username) REFERENCES User(username) ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY (cname) REFERENCES Concert(cname) ON DELETE CASCADE ON UPDATE CASCADE
 );
 create table ConcertReview(
 	username varchar(30),
@@ -217,8 +217,8 @@ create table ConcertReview(
 	review text,
 	reviewtime datetime,
 	PRIMARY KEY (username, cname, reviewtime),
-	FOREIGN KEY (username) REFERENCES User(username) ON DELETE CASCADE,
-	FOREIGN KEY (cname) REFERENCES Concert(cname) ON DELETE CASCADE
+	FOREIGN KEY (username) REFERENCES User(username) ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY (cname) REFERENCES Concert(cname) ON DELETE CASCADE ON UPDATE CASCADE 
 );
 
 create table UserRecommendList(
@@ -227,15 +227,15 @@ create table UserRecommendList(
 	lcreatetime datetime,
 	ldescription text,
 	PRIMARY KEY (listname),
-	FOREIGN KEY (username) REFERENCES User(username) ON DELETE CASCADE
+	FOREIGN KEY (username) REFERENCES User(username) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 create table ListFollower(
 	listname varchar(30),
 	follower varchar(30),
 	PRIMARY KEY (listname,follower),
-	FOREIGN KEY (follower) REFERENCES User(username) ON DELETE CASCADE ,
-	FOREIGN KEY (listname) REFERENCES UserRecommendList(listname) ON DELETE CASCADE
+	FOREIGN KEY (follower) REFERENCES User(username) ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY (listname) REFERENCES UserRecommendList(listname) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 
@@ -243,8 +243,8 @@ create table RecommendList(
 	listname varchar(30),
 	cname varchar(50),
 	PRIMARY KEY (listname, cname),
-	FOREIGN KEY (listname) REFERENCES UserRecommendList(listname) ON DELETE CASCADE,
-	FOREIGN KEY (cname) REFERENCES Concert(cname) ON DELETE CASCADE
+	FOREIGN KEY (listname) REFERENCES UserRecommendList(listname) ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY (cname) REFERENCES Concert(cname) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 create view FutureConcert as 

@@ -14,7 +14,7 @@ if(isset($SESSION["REMOTE_ADDR"]) && $SESSION["REMOTE_ADDR"] != $SERVER["REMOTE_
 
 
 if(isset($_SESSION['error']) && $_SESSION['error']){
-	echo "<div class='error'>".$_SESSION['error']."</div>";
+	// echo "<div class='error'>".$_SESSION['error']."</div>";
 	unset($_SESSION['error']);
 }
 ?> 

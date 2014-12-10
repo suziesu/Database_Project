@@ -1,7 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-<?php include "../includes/head.php";?>
+	<?php 
+	include "../includes/regular_page_head.php";
+	include "../includes/concert_list_head.html";
+	
+?>
 	<title>Admin Artist Verification</title>
 </head>
 <body>
@@ -32,12 +36,12 @@ if($unverify = $mysqli->prepare("select username,verifyID from Artist where veri
 	$unverify->bind_result($username,$verifyID);
 	while($unverify->fetch()){
 		echo "<form action='verify_artist.php' method='POST'>";
-		echo "<img scr=".$path."/LiveConcert/assets/img/".$username.".jpg/ height='42' width='42'> $username:$verifyID";
+		echo "<img scr='/LiveConcert/assets/images/".$username.".jpg' height='42' width='42'> $username:$verifyID";
 		echo "<input type='hidden' name='username' value='$username'>";
-		echo "<input type='button' name='verifyArtist' value='approve'>";
-		echo "<input type='button' name='verifyArtist' value='disapprove'>";
+		echo "<input type='submit' name='verifyArtist' value='approve'>";
+		echo "<input type='submit' name='verifyArtist' value='disapprove'>";
 		echo "</form>";
-		echo $approveERR;
+		// echo $approveERR;
 	}
 	$unverify->close();
 	$mysqli->next_result();

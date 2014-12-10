@@ -58,6 +58,7 @@
 </style>
 </head>
 <body id="page2">
+		<div class="extra">
 <body>
 <!-- this will show all the future concert
 
@@ -71,6 +72,25 @@ $username = $_SESSION['username'];
 $score = $_SESSION['score'];
 $concert_array = array();
 
+//get all typelist
+
+// $cname="";
+// $location="";
+// $time="";
+// $baname="";
+//search future concert based on name
+// <input type = "text" class="tftextinput" name="name" size="21" maxlength="80" value='' placeholder='input name' >
+// 				<input type="submit" name='button' value="inputname" class="tfbutton">
+
+// 			<input type = "text" class="tftextinput" name="location" size="21" maxlength="80" value='' placeholder='input location'>
+// 				<input type="submit" name='button' value="Location" class="tfbutton">
+
+// 			<input type = "text" class="tftextinput" name="time" size="21" maxlength="80" value=''placeholder='input time'>
+// 				<input type="submit" name='button' value="Time" class="tfbutton">
+
+// 			<input type = "text" class="tftextinput" name="bandname" size="21" maxlengt h="80" value=''placeholder='input bandname'>
+// 				<input type="submit" name='button' value="Band" class="tfbutton">
+
 
 if(isset($_POST['button'])){
 
@@ -79,6 +99,7 @@ if(isset($_POST['button'])){
 			$bandname = $_POST['bandname'];
 			if($search_band = $mysqli->query("call search_concert_in_PC_by_band('$bandname')") or die($mysqli->error)){
 				while($row = $search_band->fetch_object()){
+					echo "123";
 					$concert = array();
 					$concert['cname'] = $row->cname;
 					$concert['cdatetime'] = $row->cdatetime;
@@ -201,16 +222,17 @@ if(isset($_POST['button'])){
 			echo "no location input";
 		}
 	}
-	if($_POST['button'] == 'Name'){
+	if($_POST['button'] == 'inputname'){
 		if(isset($_POST['name'])){
 			$name = $_POST['name'];
-			//echo $name;
+			echo $name;
 			if($search_name = $mysqli->query("call search_concert_in_PC_by_name('$name')") or die($mysqli->error)){
-				//echo $search_name->num_rows;
+				echo $search_name->num_rows;
 				while($row = $search_name->fetch_object()){
+					echo "333";
 					$concert = array();
 					$concert['cname'] = $row->cname;
-					//echo $row->cname;
+					echo $row->cname;
 					$concert['cdatetime'] = $row->cdatetime;
 					$concert['locname'] = $row->locname;
 					$concert['price'] = $row->price;
@@ -229,8 +251,9 @@ if(isset($_POST['button'])){
 			}
 
 			if($score >=10){
+				echo "123";
 				if($search_name_PC = $mysqli->query("call search_concert_only_in_PC_by_name('$name')") or die($mysqli->error)){
-					//echo $search_name_PC->num_rows;
+					echo $search_name_PC->num_rows;
 					while ($row= $search_name_PC->fetch_object()) {
 						$concert = array();
 						$concert['cname'] = $row->cname;
@@ -421,9 +444,9 @@ else if(isset($_GET['type']) && isset($_GET['subtype'])){
 		<div class="extra">
 		<section id="tfheader">
 			<form id="tfnewsearch" method="POST" action="concert_list.php">
-				<!-- <tr><td>Search From Here:</td><td> -->
+				<tr><td>Search Future Concert:</td><td>
 			<input type = "text" class="tftextinput" name="name" size="21" maxlength="80" value='' placeholder='input name' >
-				<input type="submit" name='button' value="Name" class="tfbutton">
+				<input type="submit" name='button' value="inputname" class="tfbutton">
 			<input type = "text" class="tftextinput" name="location" size="21" maxlength="80" value='' placeholder='input location'>
 				<input type="submit" name='button' value="Location" class="tfbutton">
 			<input type = "text" class="tftextinput" name="time" size="21" maxlength="80" value=''placeholder='input time'>

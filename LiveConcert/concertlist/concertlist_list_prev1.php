@@ -1,89 +1,18 @@
+
 <!DOCTYPE html>
 <html>
 <head>
 	<?php include "../includes/concert_list_head.html";
 	include "../includes/regular_page_head.php";?>
 	<title>All Recommendation List</title>
-	    <style type="text/css">
-    #tfheader{
-        float:center;
-        background-color:#2e343e;
-    }
-    #tfnewsearch{
-        float:center;
-        padding:20px;
-    }
-    .tftextinput{
-        margin: 0;
-        padding: 5px 10px;
-        font-family: Arial, Helvetica, sans-serif;
-        font-size:14px;
-        border:1px solid #0076a3; border-right:0px;
-        border-top-left-radius: 5px 5px;
-        border-bottom-left-radius: 5px 5px;
-    }
-    .tfbutton {
-        margin: 0;
-        padding: 5px 15px;
-        font-family: Arial, Helvetica, sans-serif;
-        font-size:14px;
-        outline: none;
-        cursor: pointer;
-        text-align: center;
-        text-decoration: none;
-        color: #ffffff;
-        border: solid 1px #0076a3; border-right:0px;
-        background: #0095cd;
-        background: -webkit-gradient(linear, left top, left bottom, from(#00adee), to(#0078a5));
-        background: -moz-linear-gradient(top,  #00adee,  #0078a5);
-        border-top-right-radius: 5px 5px;
-        border-bottom-right-radius: 5px 5px;
-    }
-    .tfbutton:hover {
-        text-decoration: none;
-        background: #007ead;
-        background: -webkit-gradient(linear, left top, left bottom, from(#0095cc), to(#00678e));
-        background: -moz-linear-gradient(top,  #0095cc,  #00678e);
-    }
-    /* Fixes submit button height problem in Firefox */
-    .tfbutton::-moz-focus-inner {
-      border: 0;
-    }
-    .tfclear{
-        clear:both;
-    }
-</style>
 </head>
 
 <?php
 //get subtype conncertlist
 $username = $_SESSION['username'];
 $concertlist_array = array();
-$listname="";
 
-
-if (isset($_POST['button'])) {
-    if($_POST['button'] == 'Keyword'){
-        if(isset($_POST['keyword'])){
-            $keyword = $_POST['keyword'];
-            if($search_concertlist = $mysqli->query("call get_keyword_recommandconcert('$keyword')") or die($mysqli->error)){
-                while($row =$search_concertlist->fetch_object()){
-				$concertlist_result = array();
-				$concertlist_result['listname'] = $row->listname;
-				$concertlist_result['ldiscrip'] = $row->ldescription;
-				$concertlist_result['createby'] = $row->username;
-				$concertlist_result['createtime'] = $row->lcreatetime;
-				$concertlist_array[] = $concertlist_result;
-                }
-                $search_concertlist->close();
-                $mysqli->next_result();
-            }
-        }else{
-            echo "No keyword input";
-        }
-    }
-}
-else if(isset($_GET['type']) && isset($_GET['subtype'])){
+if(isset($_GET['type']) && isset($_GET['subtype'])){
 	$subtype = $_GET['subtype'];
 	if($subtypeList = $mysqli->query("call get_subtype_list('$subtype')") or die($mysqli->error)){
 		while($row = $subtypeList->fetch_object()){
@@ -152,13 +81,6 @@ and the system recommend recommedlist with similar taste
 then if user click one taste it will show this kind of taste recommendlist  -->
 <body id="page2">
 		<div class="extra">
-        <section id="tfheader">
-            <form id="tfnewsearch" method="POST" action="concertlist_list.php">
-                <tr><td></td><td>
-            <input type = "text" class="tftextinput" name="keyword" size="21" maxlength="80" value='' placeholder='input keyword' >
-                <input type="submit" name='button' value="Keyword" class="tfbutton">
-        </form>
-        </section>
 <!--==============================content================================-->
 			<section id="content">
 			<div id="sidebar">
